@@ -11,7 +11,7 @@
     <!-- Main Styles CSS -->
     <link href="css/main.css" rel="stylesheet">
 	
-	<link rel="stylesheet" href="/css/swiper.min.css">
+	<link rel="stylesheet" href="/css/swiper.css">
 	 <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
@@ -39,6 +39,7 @@
 		var playername = '';
 		var playerimg = '';
 		var pairmania_userid = 0;
+		var prevtimeinterval=0;
 	</script>
 	<style>
 .w3-sidebar{height:100%;width:200px;background-color:#fff;position:fixed!important;z-index:1000;overflow:hidden}
@@ -109,40 +110,24 @@ a:active,a:hover{outline-width:0}abbr[title]{border-bottom:none;text-decoration:
 </head>
 <body style="overflow-x:hidden">
 <% if (!user) { %>
-
-		<div id="wrapper">
-		<div class="main">
-		<div class="container">
-		<center>
-		<div class="row">
-			
-			<div class="col-md-12">
-			  <div class="logo"><img src="/Pair-Mania.png" width=280>
-			  </div>
-			</div>  
-			
-			<div class="col-md-12">  
-			  <div id="login">
-				
-				<form id="loginForm" action="/loginForm" method="get">
-					<input type="text" name="displayName" id="username" Placeholder="Username" required>
-					<input class="btn btn-primary btn-block" type="submit" value="Play">
-					<a href="/auth/facebook" class="btn btn-success btn-block fb_btn"></a>
-				</form>
-				
-			
-				   <div class="clearfix"></div>
-
-			  </div> <!-- end login -->
-			  
-			</div>
-			
-				
+<div id="wrapper" class="text-center">
+	<div class="main">
+			<div class="row">
+				<div class="col-md-12">  
+				  <div id="login">
+					<div class="logo"><img src="/Pair-Mania.png" width=280>
+						<form id="loginForm" action="/loginForm" method="get">
+							<input type="text" name="displayName" id="username" Placeholder="Username" required>
+							<input class="btn btn-primary btn-block" type="submit" value="Play">
+							<a href="/auth/facebook" class="btn btn-success btn-block fb_btn"></a>
+						</form>
+					<div class="clearfix"></div>
+					</div> <!-- end login -->
+				</div>
+			</div>	
 		</div>
-		</center>
-			</div>
-		</div>
-	</div>	
+	</div>
+</div>	
 
 <% } else { %>
 <input type="hidden" id="pairmania_userid" name="pairmania_userid" value="<%= user.pairmania_id %>"/>
@@ -203,9 +188,10 @@ function closescoreNav() {
 						<button type="button" class="btn btn-success" onclick="openscoreNav()"><span class="glyphicon glyphicon-list-alt"></span>&nbsp;Score Card</button> 
 						<button type="button" class="btn btn-info"><span class="glyphicon glyphicon-user"></span>&nbsp;Players <span class="badge" id="count"></span></button> 
 					</div>
-					<div id="restartGame" style="padding-top:5px;"></div>
+					<div id="restartGame" style="padding-top:5px;"></div> 
 				</h3>
 			</div>
+			
 			<div class="panel-body">	
 			<div  class="row">
 				<div id="targetOutcome" class="col-md-12 col-sm-12 col-xs-12"></div>
@@ -231,21 +217,13 @@ function closescoreNav() {
 						grabCursor: true,
 						freeMode: true
 					});
-					/*
-					var swiper = new Swiper('.swiper-container', {
-						scrollbar: '.swiper-scrollbar',
-						scrollbarHide: true,
-						slidesPerView: 'auto',
-						centeredSlides: true,
-						spaceBetween: 30,
-						grabCursor: true
-					});
-					*/
-				
 				</script>
 			</div>
+				<div class="col-md-12 col-sm-12 col-xs-12 text-center" id="paircomplete-alert">
+					
+				</div>
 				<div class="col-md-12 col-sm-12 col-xs-12" id="getAllpairs">		
-					<div class="col-md-12 center-text" id="currentuser" style="margin-top:10px;">
+					<div class="col-md-12 text-center" id="currentuser" style="margin-top:10px;">
 						<span id="playerneeded" style="font-size:18px;"></span>
 					</div>
 				</div>
@@ -264,12 +242,31 @@ function closescoreNav() {
 						</div><!-- /input-group -->
 					  </div><!-- /.col-lg-6 -->
 					</div><!-- /.row -->
+					
 				</div>
 			</div>	
 		  </div>
 		</div>
+		<div class="modal fade hint-model" tabindex="-1" role="dialog">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+				  <div class="modal-header" style="background-color:#dff0d8;">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove-sign"></span></button>
+					<h4 class="modal-title">You have to make following pairs to win the game and coins.</h4>
+				  </div>
+				  <div class="modal-body" >
+					<div class="list-group" id="pairmania-hint">
+					</div>
+				  </div>
+				  <div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">CLOSE</button>
+				  </div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div>
     </div>
 </div>
+
 <div id="homearea" class="panel panel-default">
 		<div class="panel-heading">
 		<h3 class="panel-title">WELCOME TO <strong>PAIR-MANIA GAME</strong><b class="pull-right">&nbsp;<a href="javascript:void(0)">PLAYERS ONLINE <span class="badge" id="allcount"></span></a></b></h3>
@@ -282,7 +279,7 @@ function closescoreNav() {
 				<div class="media-left">
 					<a href="javascript:void(0)">
 						<img class="media-object" src="<%= user.photos %>" alt="profile picture" height=80 >
-					</a>
+					</a> 
 				</div>
 				<div class="media-body">
 					<h4 class="media-heading singleuser"><strong><%= user.displayName %></strong></h4>
@@ -311,6 +308,10 @@ function closescoreNav() {
 				<div class="media-right">
 							<button class="btn btn-info" id="quickplay" type="button" style="margin-bottom:5px;width:180px">QUICK PLAY</button>
 							<button class="btn btn-success" type="button" data-toggle="modal" data-target=".create-room-model" style="margin-bottom:5px;width:180px">CREATE ROOM</button>
+							<form action="/battle" method="get">
+								<input type="hidden" id="pairmania_id" name="pairmania_id" value="<%= user.pairmania_id %>"/>
+								<input class="btn btn-primary btn-block" type="submit" value="PLAY BATTLE">
+							</form>
 							<div class="modal fade create-room-model" tabindex="-1" role="dialog">
 							  <div class="modal-dialog" role="document">
 								<div class="modal-content">
@@ -347,7 +348,6 @@ function closescoreNav() {
 								</div><!-- /.modal-content -->
 							  </div><!-- /.modal-dialog -->
 							</div>
-							
 						</div><!-- /.col-lg-6 -->
 					</div>
 				</div>	
@@ -384,12 +384,10 @@ function closescoreNav() {
 			</div>
 			</div>
 		</div>
-		</div>
 	</div>
 	<script>
 	$(document).ready(function(){
-	
-		socket.on('connect', function(){
+	    socket.on('connect', function(){
 		
 		 	playername=$('.singleuser').html();
 			playerimg = $('#profile').attr('src');
@@ -405,26 +403,32 @@ function closescoreNav() {
 	});
 	
 	function getpairs(roomlimit){
+	
 			var oldval=0;
 			var match=0;
 			var imgcnt =1;
 			var playercount = $("#count").text();
-			
+			if(prevtimeinterval) {
+					clearTimeout(prevtimeinterval);
+				}
+
 			var arraysOfIds = $('#getAllpairs img').map(function(){
                        return $(this).attr('img-val');
                    }).get();
-				   
+			console.log('arraysOfIds'+arraysOfIds.length);				   
+		    var arraysOfScore = $('#getAllpairs img').attr('img-score');
+			$('#paircomplete-alert').html('');	   
 			if(arraysOfIds.length == roomlimit){
 				for(var i=0;i<arraysOfIds.length;i++){
 					
 					var newval=arraysOfIds[i];
-					
+				
 					if(i==0){
 						oldval = newval;
 					}else{
 						if(oldval == newval){
 							match=1;
-							imgcnt=imgcnt+1
+							imgcnt=imgcnt+1;
 						}else{
 							match=0;
 							i=arraysOfIds.length;
@@ -434,17 +438,43 @@ function closescoreNav() {
 			}
 			
 			if(match){
-				socket.emit('winner', {
-					srcsocketId:socket.id,
-					playername:playername,
-					playerPlaying:playerPlaying,
-					roomlimit:roomlimit,
-					imgval:oldval,
-					imgcnt:imgcnt,
-					rank:rank
-				});
+				$('#paircomplete-alert').html('<button class="btn btn-lg btn-success" id="paircompleted">I have made my pairs</button>');
+				$('#paircompleted').click(function(){
 				
-			}
+					socket.emit('winner', {
+						srcsocketId:socket.id,
+						playername:playername,
+						playerPlaying:playerPlaying,
+						roomlimit:roomlimit,
+						roomid:currentroom,
+						roomname:currentroomname,
+						imgval:oldval,
+						imgscore:arraysOfScore,
+						imgcnt:imgcnt,
+						rank:rank,
+						status:'ready'
+					});
+				
+				$('#paircomplete-alert').html('');
+				   
+				prevtimeinterval = setTimeout(function () {
+				    $('#targetOutcome').html('<div class="alert alert-warning" role="alert"><strong>Congratulation !!!</strong> You have successfully made the pairs.</div>');
+					socket.emit('winner', {
+						srcsocketId:socket.id,
+						playername:playername,
+						playerPlaying:playerPlaying,
+						roomlimit:roomlimit,
+						roomid:currentroom,
+						roomname:currentroomname,
+						imgval:oldval,
+						imgscore:arraysOfScore,
+						imgcnt:imgcnt,
+						rank:rank,
+						status:'done'
+					});
+				}, 2000);
+				});
+			 }
 		}
 </script>
 
