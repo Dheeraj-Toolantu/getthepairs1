@@ -4,8 +4,8 @@ module.exports={
 * It consists of Twitter app information, database information.
 */
 
-	"facebook_api_key" 		: 			"1017976018309681",
-	"facebook_api_secret"	:				"41e291e9e2c88cf17416725e766a251a",
+	"facebook_api_key" 		: 			"1790052051012634",
+	"facebook_api_secret"	:				"a212c7f25ff857b9a7cadaf672e41ddd",
 	"callback_url"				:				"http://www.pairmania.com/auth/facebook/callback",
 	"use_database"				:				"false",
 	"host"								:				"localhost",
