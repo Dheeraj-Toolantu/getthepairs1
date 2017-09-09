@@ -67,17 +67,6 @@ padding-top:5%
 
 /* ---------- GENERAL ---------- */
 
-* {
-  box-sizing: border-box;
-    margin:0px auto;
-
-  &:before,
-  &:after {
-    box-sizing: border-box;
-  }
-
-}
-
 #wrapper a {
 	color: #eee;
 	text-decoration: none;
@@ -203,6 +192,104 @@ fieldset{
   display: flex;
   width: 600px;
 }
+
+.div1 {
+	border: 1px solid #a1a1a1;
+	width:185px;
+	height:255px;
+	margin-top:5px;"
+	}
+.draggable .thumbnail{
+	width:180px;
+	height:250px;
+	}	
+.draggable .thumbnail img{
+	width:175px;
+	height:235px;
+	}		
+.media-object{
+	height:80px;
+}	
+
+.swiper-container{
+	height: 380px;
+}
+    
+	
+/************************small device**************************/
+@media only screen and (max-width: 500px) {
+   .div1 {
+			border: 1px solid #a1a1a1;
+			width:95px;
+			height:135px;
+			margin-top:40px;
+		}
+	.media-object{
+		height:30px;
+	}
+	
+	.draggable .thumbnail{
+		width:78px;
+		height:100px;
+	}
+	.draggable .thumbnail img{
+		width:80px;
+		height:90px;
+	}
+	
+	 .swiper-container{
+		height:200px;
+	 }
+}
+
+@media (max-width:700px) and (min-width:501px) {
+   .div1 {
+			border: 1px solid #a1a1a1;
+			width:145px;
+			height:180px;
+			margin-top:48px;
+		}
+	.media-object{
+		height:42px;
+	}
+    
+	.draggable .thumbnail{
+		width:95px;
+		height:135px;
+	}
+	.draggable .thumbnail img{
+		width:93px;
+		height:120px;
+	}
+	
+	.swiper-container{
+		height:250px;
+	 }
+}
+
+@media (max-width:980px) and (min-width:701px) {
+   .div1 {
+			border: 1px solid #a1a1a1;
+			width:160px;
+			height:200px;
+			margin-top:52px;
+		}
+	.media-object{
+		height:50px;
+	}
+	.draggable .thumbnail{
+		width:125px;
+		height:160px;
+	}
+	.draggable .thumbnail img{
+		width:125px;
+		height:150px;
+	}
+	 .swiper-container{
+		height:250px;
+	 }
+}
+
 
 /**
  * Swiper 3.4.2
