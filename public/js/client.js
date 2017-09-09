@@ -43,7 +43,7 @@
 				playerPlaying.push(value);
 				if(value.PlayerSocketId!=socket.id){
 				    
-					$('#players').append('<div class="col-lg-2 col-md-2 col-xs-5 col-sm-4"><div class="col-md-12"><div class="media"><div class="media-left"><img src="'+value.Playerimg+'" class="media-object" style="width:60px"></div><div class="media-body"><h4 class="media-heading">' + value.player + '</h4><p>India</p></div></div></div><div class="col-md-12"><div  id="'+value.PlayerSocketId+'" data-opponant="'+value.player+'" data-opponant-socketId="'+value.PlayerSocketId+'"><div class="'+value.PlayerSocketId+' div1" style="width:185px;height:255px;margin-top:5px;"></div></div></div></div>');
+					$('#players').append('<div class="col-lg-2 col-md-2 col-xs-5 col-sm-4"><div class="col-md-12 col-sm-12 col-xs-12"><div class="media"><div class="media-left"><img src="'+value.Playerimg+'" class="media-object" ></div><div class="media-body"><h4 class="media-heading">' + value.player + '</h4><p>India</p></div></div></div><div class="col-md-12"><div  id="'+value.PlayerSocketId+'" data-opponant="'+value.player+'" data-opponant-socketId="'+value.PlayerSocketId+'"><div class="'+value.PlayerSocketId+' div1"></div></div></div></div>');
 					
 					$( "#"+value.PlayerSocketId ).droppable({
 						  drop: function( event, ui ) {
@@ -108,7 +108,7 @@
 							playersocketid:socket.id
 					});
 					console.log('Game is starting in 10 sec...');
-					$('#targetOutcome').html('<div class="alert alert-success" style="font-size:16px">Please collect the <span class="badge" style="font-size:18px">'+roomdetails.roomlimit+' same pairs</span> of image to win the Game&nbsp;<button class="btn btn-xs btn-warning" type="button" data-toggle="modal" data-target=".hint-model">Give me hint</div></div>');
+					$('#targetOutcome').html('<div class="alert alert-success" style="font-size:16px">Collect <span class="badge" style="font-size:18px">'+roomdetails.roomlimit+' same pairs</span>&nbsp;<button class="btn btn-xs btn-warning" type="button" data-toggle="modal" data-target=".hint-model">Give me hint</div></div>');
 					
 				}
 				});
@@ -172,7 +172,7 @@
 			
 	socket.on('receiveimg', function (username,data) {
 	var dragid = new Date().valueOf();
-	$('#currentuser').append('<div id="recievedrag-'+dragid+'" data-val="'+data.srcImg+'" data-score="'+data.imgscore+'" class="col-xs-3 col-sm-3 col-md-2 col-lg-2 draggable"><a href="javascript:void(0)" id="'+data.srcImg+'"class="thumbnail text-center" style="width:180px;height:250px"><img  src="/'+data.srcImg+'.jpg"  img-val="'+data.srcImg+'" img-score="'+data.imgscore+'" width="180" height="250"><span class="badge">Score: '+data.imgscore+'</span></a></div>');
+	$('#currentuser').append('<div id="recievedrag-'+dragid+'" data-val="'+data.srcImg+'" data-score="'+data.imgscore+'" class="col-xs-3 col-sm-3 col-md-2 col-lg-2 draggable"><a href="javascript:void(0)" id="'+data.srcImg+'"class="thumbnail text-center"><img  src="/'+data.srcImg+'.jpg"  img-val="'+data.srcImg+'" img-score="'+data.imgscore+'"><span class="badge">'+data.imgscore+'</span></a></div>');
 					$('#recievedrag-'+dragid).draggable({
 					  revert: 'invalid',
 					  cursor:'move'
@@ -500,7 +500,7 @@
 		//var imgvalue=['1','2','3','4','2','4','4','3','2','1','2','4','1','3','3','2'];
 		// on connection to server, ask for user's name with an anonymous callback	
 		for(var i=0;i<imgvalue.length;i++){
-			$('#currentuser').append('<div id="drag-'+imgvalue[i]+'" data-val="'+imgvalue[i]+'" data-score="'+imgscore[i]+'" class="col-xs-3 col-sm-3 col-md-2 col-lg-2 draggable"><a href="javascript:void(0)" class="thumbnail text-center" style="width:180px;height:250px"><img  src="/'+imgvalue[i]+'.jpg" img-val="'+imgvalue[i]+'" img-score="'+imgscore[i]+'" width="180" height="250"><span class="badge">Score: '+imgscore[i]+'</span></a></div>');
+			$('#currentuser').append('<div id="drag-'+imgvalue[i]+'" data-val="'+imgvalue[i]+'" data-score="'+imgscore[i]+'" class="col-xs-3 col-sm-3 col-md-2 col-lg-2 draggable"><a href="javascript:void(0)" class="thumbnail text-center"><img  src="/'+imgvalue[i]+'.jpg" img-val="'+imgvalue[i]+'" img-score="'+imgscore[i]+'" width="180" height="250"><span class="badge">'+imgscore[i]+'</span></a></div>');
 			$('#drag-'+imgvalue[i]).draggable({
 				  revert: 'invalid',
 				  cursor:'move'
