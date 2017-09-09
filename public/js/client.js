@@ -17,6 +17,7 @@
 	socket.on('showplayercount',function(playerCount){
 		$('#allcount').html(playerCount.length);
 	});
+	
 	socket.on('onlineplayers', function(onlineplayers) {
 		$('#onlineplayers').html('');
 		var i=0;
@@ -25,7 +26,6 @@
 					$('#onlineplayers').append('<div class="media" style="padding:5px"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="'+value.Playerimg+'" alt="profile picture" height="60px" ></a></div><div class="media-body"><h4><strong>'+value.player+'</strong></h4><b>&nbsp;<button class="btn btn-xs btn-primary" onclick="invitePlayer(\''+value.PlayerSocketId+'\')">Invite</button></b></div></div>');
 				}
 			});	
-		
 		})	
 	
 	// listener, whenever the server emits 'updaterooms', this updates the room the client is in
@@ -43,7 +43,7 @@
 				playerPlaying.push(value);
 				if(value.PlayerSocketId!=socket.id){
 				    
-					$('#players').append('<div class="swiper-slide col-lg-3 col-md-3 col-xs-3 col-sm-3"><div class="col-md-12"><div class="media"><div class="media-left"><img src="'+value.Playerimg+'" class="media-object" style="width:60px"></div><div class="media-body"><h4 class="media-heading">' + value.player + '</h4><p>India</p></div></div></div><div class="col-md-12"><div  id="'+value.PlayerSocketId+'" data-opponant="'+value.player+'" data-opponant-socketId="'+value.PlayerSocketId+'"><div class="'+value.PlayerSocketId+' div1" style="width:185px;height:255px;margin-top:5px;"></div></div></div></div>');
+					$('#players').append('<div class="col-lg-2 col-md-2 col-xs-5 col-sm-4"><div class="col-md-12"><div class="media"><div class="media-left"><img src="'+value.Playerimg+'" class="media-object" style="width:60px"></div><div class="media-body"><h4 class="media-heading">' + value.player + '</h4><p>India</p></div></div></div><div class="col-md-12"><div  id="'+value.PlayerSocketId+'" data-opponant="'+value.player+'" data-opponant-socketId="'+value.PlayerSocketId+'"><div class="'+value.PlayerSocketId+' div1" style="width:185px;height:255px;margin-top:5px;"></div></div></div></div>');
 					
 					$( "#"+value.PlayerSocketId ).droppable({
 						  drop: function( event, ui ) {
@@ -64,13 +64,13 @@
 						   source.draggable('destroy');
 						   source.hide(800,function(){
 								$(this).remove();
-						   }); 
-						  
-						  setTimeout(
+								setTimeout(
 								  function() 
 								  {
-									getpairs(roomdetails.roomlimit);
-								  }, 1000);
+									getpairs(roomdetails.roomlimit);	
+								  }, 200);
+							}); 
+						  
 						  }
 						});
 					  
@@ -108,15 +108,13 @@
 							playersocketid:socket.id
 					});
 					console.log('Game is starting in 10 sec...');
-					$('#targetOutcome').html('<div class="alert alert-success" style="font-size:16px">Please collect the <span class="badge" style="font-size:18px">'+roomdetails.roomlimit+' same pairs</span> of image to win the Game&nbsp;</div>');
+					$('#targetOutcome').html('<div class="alert alert-success" style="font-size:16px">Please collect the <span class="badge" style="font-size:18px">'+roomdetails.roomlimit+' same pairs</span> of image to win the Game&nbsp;<button class="btn btn-xs btn-warning" type="button" data-toggle="modal" data-target=".hint-model">Give me hint</div></div>');
 					
 				}
 				});
 				
 				countdown.start();	
 						
-						//	$('#startAlert').html(data);
-							
 								setTimeout(
 									  function() 
 									  {
@@ -174,7 +172,7 @@
 			
 	socket.on('receiveimg', function (username,data) {
 	var dragid = new Date().valueOf();
-	$('#currentuser').append('<div id="recievedrag-'+dragid+'" data-val="'+data.srcImg+'" data-score="'+data.imgscore+'" class="col-xs-3 col-sm-3 col-md-2 col-lg-2 draggable"><a href="javascript:void(0)" id="'+data.srcImg+'"class="thumbnail text-center" style="width:180px;height:250px"><img  src="/'+data.srcImg+'.jpg"  img-val="'+data.srcImg+'" width="180" height="250"><span class="badge">Score: '+data.imgscore+'</span></a></div>');
+	$('#currentuser').append('<div id="recievedrag-'+dragid+'" data-val="'+data.srcImg+'" data-score="'+data.imgscore+'" class="col-xs-3 col-sm-3 col-md-2 col-lg-2 draggable"><a href="javascript:void(0)" id="'+data.srcImg+'"class="thumbnail text-center" style="width:180px;height:250px"><img  src="/'+data.srcImg+'.jpg"  img-val="'+data.srcImg+'" img-score="'+data.imgscore+'" width="180" height="250"><span class="badge">Score: '+data.imgscore+'</span></a></div>');
 					$('#recievedrag-'+dragid).draggable({
 					  revert: 'invalid',
 					  cursor:'move'
@@ -309,13 +307,15 @@
 	
 	socket.on('writeFinalResult', function (data) {
 	    $("#writeFinalResult").html('');
-	    $(".swiper-container").hide(500);
+		$('#targetOutcome').html('<div class="alert alert-danger" style="font-size:16px">Game  Over !!!<button id="leaveRoom" class="btn btn-primary pull-right">Leave The Room</button></div>');
+		$(".swiper-container").hide(500);
 		$("#getAllpairs").hide(500);
 		$("#menuToggler").hide(500);
 		$("#restartGame").hide(500);
 		
 		var str3='';
 		var str4='';
+		if(data.length){
 		for(var l=0;l < data.length;l++){
 		    str3='';
 			str4='';
@@ -331,7 +331,7 @@
 			var imgscore = new Array();
 			imgscore = str5.split(",");
 			
-			str3 = '<div class="col-md-4"><div class="panel panel-default"><div class="panel-heading"><h4><img src="'+playerimg+'" width="50px">&nbsp;'+data[l].usercollec_username+'&nbsp;<span class="badge">Total Coins: '+data[l].usertotalscore+'</span></h4></div><div class="panel-body"><ul class="list-group">';
+			str3 = '<div class="col-md-4"><div class="panel panel-default"><div class="panel-heading"><h4><img src="'+data[l].userimg+'" width="50px">&nbsp;'+data[l].usercollec_username+'&nbsp;<span class="badge">Total Coins: '+data[l].usertotalscore+'</span></h4></div><div class="panel-body"><ul class="list-group">';
 			
 			for(var m=0;m<imgval.length;m++){
 				str4 = str4 + '<li class="list-group-item"><div class="media"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="/'+imgval[m]+'.jpg" alt="profile picture" height="40px" ></a></div><div class="media-body"><b>&nbsp;<span class="badge">Pairs : '+imgcnt[m]+'</span>&nbsp;<span class="badge">Coins : '+imgscore[m]+'</span></b></div></div></li>';
@@ -348,6 +348,9 @@
 				$("#menuToggler").show(500);
 			}
 		});*/
+		}else{
+			$("#writeFinalResult").append('<div class="alert alert-danger">Sorry :( No one is able to make any pairs!!!</div>');
+		}
 	});
 	
 	
@@ -447,8 +450,8 @@
 			roomid:roomid,
 			roomname:roomname,
 			Playerusername : playername,
-			Playerimg : playerimg,		
-			pairmania_id : pairmania_userid,			
+			Playerimg : playerimg,
+			pairmania_id : pairmania_userid,
 			PlayerSocketId : socket.id
 		});
 	}
@@ -471,11 +474,16 @@
 	
 	socket.on('receiveInvitation', function (data) {
 	    var password='na';
-		$('#invitations').append('<li class="list-group-item"><b>'+data.sendername+' has invited to join '+ data.roomname+'</b>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" class="btn btn-sm btn-primary" onclick="joinRoom(\''+data.roomid+'\',\''+data.roomname+'\')">click here to join</a></li>');
+		$('#invitations').append('<li class="list-group-item"><strong>'+data.sendername+' has invited to join '+ data.roomname+'</strong>&nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:void(0)" class="btn btn-sm btn-primary" onclick="joinRoom(\''+data.roomid+'\',\''+data.roomname+'\')">click here to join</a></li>');
 	});
-
+    
+	socket.on('receivebattleInvitation', function (data) {
+		$('#invitations').append('<li class="list-group-item">'+data.sendername+' wants to battle with you. Click on the <strong>Play Battle</strong> button to start the battle</li>');
+	});
+	
 	socket.on('sendImg', function (data) {
 		$('#currentuser').html('');
+		$('#pairmania-hint').html('');
 		$("#menuToggler").hide(500);
 		closeNav();
 		
@@ -492,11 +500,18 @@
 		//var imgvalue=['1','2','3','4','2','4','4','3','2','1','2','4','1','3','3','2'];
 		// on connection to server, ask for user's name with an anonymous callback	
 		for(var i=0;i<imgvalue.length;i++){
-			$('#currentuser').append('<div id="drag-'+imgvalue[i]+'" data-val="'+imgvalue[i]+'" data-score="'+imgscore[i]+'" class="col-xs-3 col-sm-3 col-md-2 col-lg-2 draggable"><a href="javascript:void(0)" class="thumbnail text-center" style="width:180px;height:250px"><img  src="/'+imgvalue[i]+'.jpg" img-val="'+imgvalue[i]+'" width="180" height="250"><span class="badge">Score: '+imgscore[i]+'</span></a></div>');
+			$('#currentuser').append('<div id="drag-'+imgvalue[i]+'" data-val="'+imgvalue[i]+'" data-score="'+imgscore[i]+'" class="col-xs-3 col-sm-3 col-md-2 col-lg-2 draggable"><a href="javascript:void(0)" class="thumbnail text-center" style="width:180px;height:250px"><img  src="/'+imgvalue[i]+'.jpg" img-val="'+imgvalue[i]+'" img-score="'+imgscore[i]+'" width="180" height="250"><span class="badge">Score: '+imgscore[i]+'</span></a></div>');
 			$('#drag-'+imgvalue[i]).draggable({
 				  revert: 'invalid',
 				  cursor:'move'
 				})
+			var hintpair='';
+			var coin = (imgscore[i])*(data.roomlimit);
+            for(var j=1;j<=data.roomlimit;j++){
+				hintpair=hintpair+'<div class="col-md-2 col-sm-2 col-xs-2" ><img  src="/'+imgvalue[i]+'.jpg" class="thumbnail" style="height:10%;"></div>';
+			}
+			$('#pairmania-hint').append('<div href="#" class="list-group-item row" style="height:auto !important"><h4 class="list-group-item-heading">If you are making this pairs then you will get&nbsp;<span class="badge">'+coin+' COINS</span></h4><p class="list-group-item-text">'+hintpair+'</p></div>');
+					
 		}
 	});
 	
@@ -507,7 +522,9 @@
 			var message = $('#data').val();
 			$('#data').val('');
 			// tell server to execute 'sendchat' and send along one parameter
-			socket.emit('sendchat', message);
+			if(message){
+				socket.emit('sendchat', message);
+			}
 		});
 
 		// when the client hits ENTER on their keyboard
@@ -579,16 +596,19 @@
 					}
 				});		
 	}
-	
+		
 	socket.on('gettimer',function(data){
 	    var match = 0;
 		var matchval=0;
 		var newval = 0;	
 		var oldval = 0;
 		var targetattr = data.srcsocketid;
+		
 		var arraysOfIds = $('#getAllpairs img').map(function(){
                        return $(this).attr('img-val');
                    }).get();
+
+				   
 	    //alert(arraysOfIds.length+" - "+data.roomlimit+" - "+targetattr);
 		if(arraysOfIds.length > data.roomlimit){
 				$("."+targetattr).html('<div id="countdown"></div>');
@@ -649,18 +669,45 @@
 		}
 	});
 	
-	
 	socket.on('startquickreplay', function(data) {
 			socket.emit('quickreplay',{
 				quickplaycount:data.quickplaycount,
 				PlayerSocketId : socket.id
 			})
 	});
+	
+	socket.on('playagain', function(data) {
+		$('.'+data.PlayerSocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;"+data.Playerusername+" is ready to play</div>");	
+	});
 
-	$(document).on("click","#quickplay",function(e){
-			
-				socket.emit('quickplay',
-				{
-					PlayerSocketId : socket.id
-				});				
-			});
+	$(document).on("click","#quickplay",function(e){			
+		socket.emit('quickplay',
+		{
+			PlayerSocketId : socket.id
+		});				
+	});
+		
+	$(document).on("click","#restartGame",function(e){	
+		$('#paircomplete-alert').html('');	
+		$('#restartGame').hide(200);	
+	});
+	
+	$(document).on("click","#leaveRoom",function(e){
+		var mydetails = playerPlaying.filter(function(item){ 
+			return (item.PlayerSocketId == socket.id); 
+		});
+		playerPlaying = playerPlaying.filter(function(item){ 
+			return (item.PlayerSocketId == socket.id); 
+		});
+		$('#gamearea').addClass('hidepannel');	
+		$('#homearea').removeClass('hidepannel');	
+		socket.emit('leaveRoom',mydetails[0]);	
+		$("#writeFinalResult").html('');
+		$(".swiper-container").show(500);
+		$("#getAllpairs").show(500);
+		$("#menuToggler").show(500);
+		$("#restartGame").show(500);
+		$("#CountDownTimer").TimeCircles().destroy();
+		$("#CountDownTimer").html('');
+		$("#conversation").html('');
+	});	
