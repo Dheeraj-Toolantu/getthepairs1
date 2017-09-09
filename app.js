@@ -1,21 +1,22 @@
 var path = require("path");  
 var mysql = require('mysql');
 
-/*
+
 var con = mysql.createConnection({
     host: "getthepair.cr1a92pwyyql.us-east-2.rds.amazonaws.com",
     user: "toolantu",
     password: "789system",
     database:"getthepair"
 });
-*/
 
+/*
 var con = mysql.createConnection({
     host: "127.0.0.1",
     user: "root",
     password: "",
     database:"getthepairs"
 });
+*/
 
 con.connect(function(err) {
 		  if (err) throw err;
@@ -245,8 +246,8 @@ function ensureAuthenticated(req, res, next) {
   res.redirect('/login')
 }
 
-//server.listen(process.env.PORT);
-server.listen(4000);
+server.listen(process.env.PORT || 80 || 3000 || 4000);
+//server.listen(4000);
 
 process.env.PWD = process.cwd()
 	
