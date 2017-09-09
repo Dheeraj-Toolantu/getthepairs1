@@ -43,7 +43,7 @@
 				playerPlaying.push(value);
 				if(value.PlayerSocketId!=socket.id){
 				    
-					$('#players').append('<ul class="col-md-2 col-sm-3 col-xs-3 list-group" style="z-index:0"><li class="list-group-item"><div class="media"><div class="media-left"><img src="'+value.Playerimg+'" class="media-object" ></div><div class="media-body"><h4 class="media-heading">' + value.player + '</h4></div></div></li><li class="list-group-item" id="'+value.PlayerSocketId+'" data-opponant="'+value.player+'" data-opponant-socketId="'+value.PlayerSocketId+'"><div class="'+value.PlayerSocketId+' div1"></div></li></ul>');
+					$('#players').append('<ul class="col-md-4 col-sm-4 col-xs-6 list-group" style="z-index:0"><li class="list-group-item"><div class="media"><div class="media-left"><img src="'+value.Playerimg+'" class="media-object" ></div><div class="media-body"><h4 class="media-heading">' + value.player + '</h4></div></div></li><li class="list-group-item" id="'+value.PlayerSocketId+'" data-opponant="'+value.player+'" data-opponant-socketId="'+value.PlayerSocketId+'"><div class="'+value.PlayerSocketId+' div1"></div></li></ul>');
 					
 					$( "#"+value.PlayerSocketId ).droppable({
 						  drop: function( event, ui ) {
