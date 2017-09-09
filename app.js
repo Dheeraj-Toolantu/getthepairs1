@@ -17,7 +17,7 @@ var con = mysql.createConnection({
     database:"getthepairs"
 });
 */
-	
+
 con.connect(function(err) {
 		  if (err) throw err;
 		  console.log("Connected to db!");
@@ -45,8 +45,12 @@ var usernames = {};
 var quizrooms = [];
 var playerScorecard = [];
 var rooms = [];
+var restartrooms = [];
 var onlineplayers = [];
+var onlinebattleplayers = [];
 var players = [];
+var battleplayers = [];
+var battlerooms = [];
 var senders=[];
 var roomno=1;
 var playerlimit=4;
@@ -56,6 +60,8 @@ var playerCount=0;
 var quickplaycount=0;
 var quickplayroomid=0;
 var quickplayroom={};
+var battleplaycount=0;
+var battleplayroomid=0;
 // Passport session setup.
 
 passport.serializeUser(function(user, done) {
@@ -126,6 +132,9 @@ app.get('/loginForm', function(req, res){
 						tempuser["score"]=rows[0].user_info_score;
 						tempuser["pairs"]=rows[0].user_info_pair_cnt;
 						res.render('index', { user: tempuser });
+						if(tempuser["pairs"]>=30){
+							onlinebattleplayers.push(tempuser);
+						}
 						console.log('profile pic is '+req.query.photos);
 				   });
 				});   
@@ -139,10 +148,48 @@ app.get('/loginForm', function(req, res){
 				tempuser["score"]=rows[0].user_info_score;
 				tempuser["pairs"]=rows[0].user_info_pair_cnt;
 				res.render('index', { user: tempuser });
+				if(tempuser["pairs"]>=30){
+					onlinebattleplayers.push(tempuser);
+				}
 				console.log('profile pic is '+req.query.photos);
 			   });
 			   
 			}
+          });
+});
+
+app.get('/battle', function(req, res){
+	var pairmania_id = req.query.pairmania_id;
+	var tempuser ={};
+	var ipaddr = ip.address();
+	con.query("SELECT * from pairmania_user_info where pairmania_id="+pairmania_id+"",function(err,rows,fields){
+        if(err) throw err;
+			console.log(rows.length);
+			if(rows.length)
+				{
+					if(rows[0].user_info_pair_cnt>=30){
+						tempuser["displayName"]=rows[0].user_info_name;
+						tempuser["pairmania_id"]=rows[0].pairmania_id;
+						tempuser["score"]=rows[0].user_info_score;
+						tempuser["pairs"]=rows[0].user_info_pair_cnt;
+						tempuser["photos"]=rows[0].user_info_img;
+						tempuser["status"]='eligible';
+						res.render('battle', { user: tempuser });
+						
+					}else{
+						tempuser["displayName"]=rows[0].user_info_name;
+						tempuser["pairmania_id"]=rows[0].pairmania_id;
+						tempuser["score"]=rows[0].user_info_score;
+						tempuser["pairs"]=rows[0].user_info_pair_cnt;
+						tempuser["photos"]=rows[0].user_info_img;
+						tempuser["status"]='not eligible';
+						res.render('battle', { user: tempuser });
+					}
+				}
+			else
+				{
+					console.log("User already exists in database");
+				}
           });
 });
 
@@ -182,6 +229,9 @@ app.get('/auth/facebook/callback',
 		req._passport.session.user["score"]=rows[0].user_info_score;
 		req._passport.session.user["pairs"]=rows[0].user_info_pair_cnt;
 		res.render('index', { user: req._passport.session.user });
+		if(rows[0].user_info_pair_cnt>=30){
+			onlinebattleplayers.push(req._passport.session.user);
+		}
 	   });
 	//res.redirect('/user='+req._passport.session.user);
   });
@@ -196,8 +246,8 @@ function ensureAuthenticated(req, res, next) {
   res.redirect('/login')
 }
 
-//server.listen(process.env.PORT);
-server.listen(4000);
+server.listen(process.env.PORT || 80 || 3000 || 4000);
+//server.listen(4000);
 
 process.env.PWD = process.cwd()
 	
@@ -207,28 +257,49 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 io.sockets.on('connection', function (socket) {
 	// when the client emits 'adduser', this listens and executes
-	socket.on('adduser', function(username){
-		
-		if(rooms.length > playerlimit)
-		  {	  
+		socket.on('adduser', function(username){
+		var onlinebattleplayer={};
+		var player={};
+		if(rooms.length > playerlimit){	  
 			roomno++;
 			playerlimit=playerlimit+4;
-		  }
+		}
 		 
-		 socket.username = username.Playerusername;
-			player={
-				"player" : username.Playerusername,
-				"Playerimg" : username.Playerimg,
-				"pairmania_id" : username.pairmania_id,
-				"PlayerSocketId" : username.PlayerSocketId
+		socket.username = username.Playerusername;
+		player={
+			"player" : username.Playerusername,
+			"Playerimg" : username.Playerimg,
+			"pairmania_id" : username.pairmania_id,
+			"PlayerSocketId" : username.PlayerSocketId
+		}
+		
+		onlinebattleplayer = onlinebattleplayers.filter(function(item){ 
+			 return (item.pairmania_id == username.pairmania_id); 
+		});
+		
+		if(onlinebattleplayer.length){
+	
+			for(var i=0;i<onlinebattleplayers.length;i++){
+				if(onlinebattleplayers[i].pairmania_id==username.pairmania_id){
+					
+					onlinebattleplayers.splice(i, 1);
+					onlinebattleplayers.push(player);
+				}
 			}
-			onlineplayers.push(player);
-     		usernames[username] = username.PlayerSocketId;
-			socket.broadcast.emit('onlineplayers', onlineplayers);
-			console.log('added user: '+player.player);
-			socket.emit('updaterooms', rooms);
-			socket.emit('showplayercount', onlineplayers);
-			socket.broadcast.emit('showplayercount', onlineplayers);
+			
+			
+			socket.broadcast.emit('onlinebattleplayers', onlinebattleplayers);
+			console.log('me ahe battle player!!!'+player.pairmania_id);
+			console.log(onlinebattleplayers.length);
+		}			
+		
+		onlineplayers.push(player);
+		usernames[username] = username.PlayerSocketId;
+		socket.broadcast.emit('onlineplayers', onlineplayers);
+		console.log('added user: '+player.player);
+		socket.emit('updaterooms', rooms);
+		socket.emit('showplayercount', onlineplayers);
+		socket.broadcast.emit('showplayercount', onlineplayers);
 	});
 	
 	// when the client emits 'sendchat', this listens and executes
@@ -256,24 +327,20 @@ io.sockets.on('connection', function (socket) {
 			
 			var playerlimit =3;
 			var imgscore='';
-			
+			var randnum=0;
+			for(var t=1;t<=playerlimit;t++){
+				randnum = Math.floor(Math.random() * 500) + 50; 
+				imgscore = imgscore.concat(randnum,',');
+			}
+			console.log('imgscore of the room--->'+imgscore)
 			con.query("SELECT * FROM pairtype WHERE ptype_player_count="+playerlimit+" order by rand() limit 1", function (err, row, fields) {
 				if (err) throw err;
-						imgvalue=row[0].ptype_set;
-						con.query("SELECT GROUP_CONCAT(img_score SEPARATOR ',') as imgscore FROM imgpair WHERE imgval in ("+imgvalue+") ", function (err, row1, fields) {
-							if (err) throw err;
-								imgscore=row1[0].imgscore;
-				//				console.log("imgscore of room-->"+imgscore);
-								quickplayroom['imgvalue'] = imgvalue;
-								quickplayroom['imgscore'] = imgscore;
-								rooms.push(quickplayroom);
-								//socket.emit('updaterooms', quickplayroom);
-								//socket.broadcast.emit('updaterooms', quickplayroom);
-								//console.log('rooms created :'+ quickplayroom.roomid +' '+quickplayroom.roomname);
-								//console.log('rooms created with img:'+ quickplayroom.imgvalue);
-								//console.log('rooms created with imgscore:'+ quickplayroom .imgscore);
-								joinQuickplay(quickplayroom,data.PlayerSocketId);
-						});
+					imgvalue=row[0].ptype_set;
+					quickplayroom['imgvalue'] = imgvalue;
+					quickplayroom['imgscore'] = imgscore;
+					rooms.push(quickplayroom);
+					joinQuickplay(quickplayroom,data.PlayerSocketId);
+					
 				});
 		
 		}else if((quickplaycount > 0) && (quickplaycount<=5)) {
@@ -325,29 +392,26 @@ io.sockets.on('connection', function (socket) {
 			var playerlimit =3;
 			var imgscore='';
 			
+			var randnum=0;
+			for(var t=1;t<=playerlimit;t++){
+				randnum = Math.floor(Math.random() * 500) + 50; 
+				imgscore = imgscore.concat(randnum,',');
+			}
+			console.log('imgscore of the room--->'+imgscore)
+			
 			con.query("SELECT * FROM pairtype WHERE ptype_player_count="+playerlimit+" order by rand() limit 1", function (err, row, fields) {
 				if (err) throw err;
 						imgvalue=row[0].ptype_set;
-						con.query("SELECT GROUP_CONCAT(img_score SEPARATOR ',') as imgscore FROM imgpair WHERE imgval in ("+imgvalue+") ", function (err, row1, fields) {
-							if (err) throw err;
-								imgscore=row1[0].imgscore;
-				//				console.log("imgscore of room-->"+imgscore);
-								quickplayroom['imgvalue'] = imgvalue;
-								quickplayroom['imgscore'] = imgscore;
-								rooms.push(quickplayroom);
-								//socket.emit('updaterooms', quickplayroom);
-								//socket.broadcast.emit('updaterooms', quickplayroom);
-								//console.log('rooms created :'+ quickplayroom.roomid +' '+quickplayroom.roomname);
-								//console.log('rooms created with img:'+ quickplayroom.imgvalue);
-								//console.log('rooms created with imgscore:'+ quickplayroom .imgscore);
-								joinQuickplay(quickplayroom,data.PlayerSocketId);
-						});
+						imgscore=imgscore;
+						quickplayroom['imgvalue'] = imgvalue;
+						quickplayroom['imgscore'] = imgscore;
+						rooms.push(quickplayroom);
+						joinQuickplay(quickplayroom,data.PlayerSocketId);
+					
 				});
-		
 		}	
 	});
-	
-	
+	 
 	function joinQuickplay(newroom,PlayerSocketId){
 		
 		var oldroom;
@@ -390,26 +454,32 @@ io.sockets.on('connection', function (socket) {
 	socket.on('create', function(room) {
 		var playerlimit = room.roomlimit;
 		var imgscore='';
-		console.log("creating room...");
 		
+		var randnum=0;
+			for(var t=1;t<=playerlimit;t++){
+				randnum = Math.floor(Math.random() * 500) + 50; 
+				imgscore = imgscore.concat(randnum,',');
+			}
+			console.log('creating room...--->'+imgscore);
+			
 		con.query("SELECT * FROM pairtype WHERE ptype_player_count="+playerlimit+" order by rand() limit 1", function (err, row, fields) {
 			if (err) throw err;
-					imgvalue=row[0].ptype_set;
-					con.query("SELECT GROUP_CONCAT(img_score SEPARATOR ',') as imgscore FROM imgpair WHERE imgval in ("+imgvalue+") ", function (err, row1, fields) {
-						if (err) throw err;
-							imgscore=row1[0].imgscore;
-							console.log("imgscore of room-->"+imgscore);
-							room['imgvalue'] = imgvalue;
-							room['imgscore'] = imgscore;
-							room['status']='pending';
-							rooms.push(room);
-							
-							socket.emit('updaterooms', rooms);
-							socket.broadcast.emit('updaterooms', rooms);
-							console.log('rooms created :'+ room.roomid +' '+room.roomname);
-							console.log('rooms created with img:'+ room.imgvalue);
-							console.log('rooms created with imgscore:'+ room.imgscore);
-					});
+
+				imgvalue=row[0].ptype_set;
+				
+				imgscore=imgscore;
+				console.log("imgscore of room-->"+imgscore);
+				room['imgvalue'] = imgvalue;
+				room['imgscore'] = imgscore;
+				room['status']='pending';
+				rooms.push(room);
+				
+				socket.emit('updaterooms', rooms);
+				socket.broadcast.emit('updaterooms', rooms);
+				console.log('rooms created :'+ room.roomid +' '+room.roomname);
+				console.log('rooms created with img:'+ room.imgvalue);
+				console.log('rooms created with imgscore:'+ room.imgscore);
+	
 			});
 	});
 	
@@ -445,7 +515,7 @@ io.sockets.on('connection', function (socket) {
 		// add the client's username to the global list
 		//usernames[username] = newroom.PlayerSocketId;
 	
-		  //Send this event to everyone in the room.
+		//Send this event to everyone in the room.
 		io.sockets.in(socket.room).emit('connectToRoom', "You are in room no. "+newroom.roomname+" ("+newroom.roomid+")");
 		// echo to room 1 that a person has connected to their room
 		socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.username + ' has connected to this room');
@@ -563,98 +633,106 @@ io.sockets.on('connection', function (socket) {
 		socket.broadcast.to(data.receiver).emit('receiveInvitation',data);
 	});
 	
+	socket.on('sendbattleInvitation',function(data) {
+		console.log('sending invitation to->>'+data.receiver);
+		socket.broadcast.to(data.receiver).emit('receivebattleInvitation',data);
+	});
+	
 	socket.on('winner', function (data) {
-		var currentroomid='';
-		var currentroomname='';
-		var pairmania_id=0;
-		var winningPlayer={};
-		var userscore=0;
-		var winningPlayerarr={};
-		var playerPlaying = data.playerPlaying;
-		var currentroomlimit=data.roomlimit;
-		
-			for(var i=0;i<playerPlaying.length;i++){ 
-				if(playerPlaying[i].PlayerSocketId==socket.id){
-					currentroomid = playerPlaying[i].roomid;
-					currentroomname = playerPlaying[i].room;
-					pairmania_id = playerPlaying[i].pairmania_id;
-					data['roomid'] = currentroomid;
-					data['roomname'] = currentroomname;
-					data['pairmania_id'] = pairmania_id;
-					console.log('room & pairmania_id: '+currentroomid+" & "+pairmania_id);
-					playerPlaying = playerPlaying.filter(function(item){ 
-						//console.log('winner player with filter-->>'+item);
-						 return (item.PlayerSocketId !== socket.id); 
-					});
+			
+			var pairmania_id=0;
+			var winningPlayer={};
+			var userscore=0;
+			var winningPlayerarr={};
+			var playerPlaying = data.playerPlaying;
+			var currentroomlimit=data.roomlimit;
+			var currentroomid=data.roomid;
+			var currentroomname = data.roomname;
+				for(var i=0;i<playerPlaying.length;i++){ 
+					if(playerPlaying[i].PlayerSocketId==socket.id){
+						pairmania_id = playerPlaying[i].pairmania_id;
+						data['pairmania_id'] = pairmania_id;
+						playerPlaying = playerPlaying.filter(function(item){ 
+							 return (item.PlayerSocketId !== socket.id); 
+						});
+					}
 				}
-			}
-		
-		
-		playerScorecard = playerScorecard.filter(function(item){ 
-					//console.log('winner player with filter-->>'+item);
+				
+			data['roomid'] = currentroomid;
+			data['roomname'] = currentroomname;
+			
+			playerScorecard = playerScorecard.filter(function(item){ 
 					 return (item.srcsocketId !== socket.id); 
 				});	 
-		 
-		console.log('updated pending player-->'+playerPlaying.length);
+			 
+			console.log('updated pending player-->'+playerPlaying.length);
+					
+			con.query("SELECT * FROM imgpair WHERE imgval="+data.imgval+" limit 1", function (err, row, fields) {
 				
-		con.query("SELECT * FROM imgpair WHERE imgval="+data.imgval+" limit 1", function (err, row, fields) {
-			if (err) throw err;
-					imgvalue=row[0].img_score;
-					if(data.rank==1){
-						data['score'] = (1000 + (parseInt(data.imgcnt) * imgvalue));
-						userscore= (1000 + (parseInt(data.imgcnt) * imgvalue));
-					}else if(data.rank==2){
-						data['score'] = (500 + (parseInt(data.imgcnt) * imgvalue));
-						userscore= (500 + (parseInt(data.imgcnt) * imgvalue));
-					}else if(data.rank==3){
-						data['score'] = (200 + (parseInt(data.imgcnt) * imgvalue));
-						userscore= (200 + (parseInt(data.imgcnt) * imgvalue));
-					}else if(data.rank==4){
-						data['score'] = (100 + (parseInt(data.imgcnt) * imgvalue));
-						userscore= (100 + (parseInt(data.imgcnt) * imgvalue));
-					}else if(data.rank==5){
-						data['score'] = (50 + (parseInt(data.imgcnt) * imgvalue));
-						userscore= (50 + (parseInt(data.imgcnt) * imgvalue));
-					}else{
-					   data['score'] = (10 + (parseInt(data.imgcnt) * imgvalue));
-					   userscore= (10 + (parseInt(data.imgcnt) * imgvalue));
-					}
-				
-				console.log("score-->"+userscore);
-				con.query("INSERT INTO userpaircollection SET  usercollec_pairmania_id="+pairmania_id+",usercollec_imgval="+data.imgval+",usercollec_img_count="+data.imgcnt+",usercollec_userrank="+data.rank+",usercollec_user_score="+userscore+",usercollec_username='"+data.playername+"',usercollec_usersocketid='"+data.srcsocketId+"',usercollec_room='"+currentroomid+"',usercollec_user_ipaddr='"+ip.address()+"' ", function (err, result) {
-					if (err) throw err;
-					console.log("1 record inserted in userpaircollection");
-				});
-				
-				con.query("UPDATE pairmania_user_info SET  user_info_score=user_info_score+"+userscore+",user_info_pair_cnt=user_info_pair_cnt+"+data.imgcnt+" WHERE pairmania_id="+pairmania_id+"", function (err, result) {
-					if (err) throw err;
-					console.log("1 record updated in pairmania_user_info");
-				});
-				
-				playerScorecard.push(data);
-				socket.broadcast.to(currentroomid).emit('alertWinner',data,playerScorecard,playerPlaying,currentroomname,currentroomid,currentroomlimit);
-				socket.emit('disableplayer',playerPlaying);
-				console.log('After updated length'+playerPlaying.length);
+				if (err) throw err;
+						imgvalue=data.imgscore;
+						if(data.rank==1){
+							data['score'] = (1000 + (parseInt(data.imgcnt) * imgvalue));
+							userscore= (1000 + (parseInt(data.imgcnt) * imgvalue));
+						}else if(data.rank==2){
+							data['score'] = (500 + (parseInt(data.imgcnt) * imgvalue));
+							userscore= (500 + (parseInt(data.imgcnt) * imgvalue));
+						}else if(data.rank==3){
+							data['score'] = (200 + (parseInt(data.imgcnt) * imgvalue));
+							userscore= (200 + (parseInt(data.imgcnt) * imgvalue));
+						}else if(data.rank==4){
+							data['score'] = (100 + (parseInt(data.imgcnt) * imgvalue));
+							userscore= (100 + (parseInt(data.imgcnt) * imgvalue));
+						}else if(data.rank==5){
+							data['score'] = (50 + (parseInt(data.imgcnt) * imgvalue));
+							userscore= (50 + (parseInt(data.imgcnt) * imgvalue));
+						}else{
+						   data['score'] = (10 + (parseInt(data.imgcnt) * imgvalue));
+						   userscore= (10 + (parseInt(data.imgcnt) * imgvalue));
+						}
+					
+					console.log("score-->"+userscore);
 						
+					if(data.status=='done'){
+						con.query("INSERT INTO userpaircollection SET  usercollec_pairmania_id="+pairmania_id+",usercollec_imgval="+data.imgval+",usercollec_img_count="+data.imgcnt+",usercollec_userrank="+data.rank+",usercollec_user_score="+userscore+",usercollec_username='"+data.playername+"',usercollec_usersocketid='"+data.srcsocketId+"',usercollec_room='"+currentroomid+"',usercollec_user_ipaddr='"+ip.address()+"' ", function (err, result) {
+							if (err) throw err;
+							console.log("1 record inserted in userpaircollection");
+						});
+						
+						con.query("UPDATE pairmania_user_info SET  user_info_score=user_info_score+"+userscore+",user_info_pair_cnt=user_info_pair_cnt+"+data.imgcnt+" WHERE pairmania_id="+pairmania_id+"", function (err, result) {
+							if (err) throw err;
+							console.log("1 record updated in pairmania_user_info");
+						});
+						playerScorecard.push(data);
+					}else if(data.status=='ready'){
+						socket.broadcast.to(currentroomid).emit('alertWinner',data,playerScorecard,playerPlaying,currentroomname,currentroomid,currentroomlimit);
+						socket.emit('disableplayer',playerPlaying);
+						console.log('After updated length'+playerPlaying.length);
+					}
 			});
-	});
+	   });
 	
 	socket.on('gameover', function (playersocketid,pendingPlayers,currentroomname,currentroomid,playerlimit) {
 		var room = {};
 		var imgvalue ='';
+		var imgscore='';
 		var cntr=0;
 		var playercnt = ''+playerlimit+'';
 		console.log('after creting room-->' + playercnt);
-		if(!cntr){
 		
+		if(!cntr){
+			
+		var randnum=0;
+			for(var t=1;t<=playerlimit;t++){
+				randnum = Math.floor(Math.random() * 500) + 50; 
+				imgscore = imgscore.concat(randnum,',');
+			}
+			console.log('recreating room with score ...--->'+imgscore);
+			
 		con.query("SELECT * FROM pairtype  WHERE ptype_player_count ="+playercnt+" order by rand() limit 1", function (err, row, fields) {
 			if (err) throw err;
 					imgvalue=row[0].ptype_set;
-					con.query("SELECT GROUP_CONCAT(img_score SEPARATOR ',') as imgscore FROM imgpair WHERE imgval in ("+imgvalue+") ", function (err, row1, fields) {
-						if (err) throw err;
-						
-						imgscore=row1[0].imgscore;
-							
+					
 						room =  {
 								 'roomid' : currentroomid,
 								 'roomname' : currentroomname,
@@ -671,9 +749,8 @@ io.sockets.on('connection', function (socket) {
 						socket.broadcast.to(currentroomid).emit('recreateroom', room);
 						displayResult(playersocketid,currentroomid);
 						console.log("game is over:-->"+socket.room);
-					});
-			
-			});
+				
+			}); 
 		cntr++;
 		}			 
 	});
@@ -701,41 +778,84 @@ io.sockets.on('connection', function (socket) {
 		var currentroomid = data.roomid;
 		var currentroomname = data.roomname;
 		console.log('displaying Final Result....'+currentroomname+' ('+currentroomid+')' );
-		con.query("Select GROUP_CONCAT(tbl1.usercollec_imgval SEPARATOR ',') as usercollec_imgval,GROUP_CONCAT(tbl1.usercollec_img_count SEPARATOR ',') as usercollec_img_count,GROUP_CONCAT(tbl1.userscore SEPARATOR ',') as userscore,tbl1.usercollec_username,tbl2.usertotalscore from (SELECT usercollec_room,usercollec_usersocketid,usercollec_username,usercollec_imgval,sum(usercollec_img_count) as usercollec_img_count,sum(usercollec_user_score) as userscore FROM userpaircollection WHERE usercollec_room ='"+currentroomid+"'  group by usercollec_usersocketid,usercollec_username,usercollec_imgval,usercollec_room order by usercollec_username) tbl1 inner join (select usercollec_usersocketid,sum(usercollec_user_score) as usertotalscore from userpaircollection where usercollec_room='"+currentroomid+"' group by usercollec_usersocketid) tbl2 on tbl1.usercollec_usersocketid=tbl2.usercollec_usersocketid group by tbl1.usercollec_usersocketid order by tbl2.usertotalscore desc", function (err, row, fields) {
+		con.query("Select GROUP_CONCAT(tbl1.usercollec_imgval SEPARATOR ',') as usercollec_imgval,GROUP_CONCAT(tbl1.usercollec_img_count SEPARATOR ',') as usercollec_img_count,GROUP_CONCAT(tbl1.userscore SEPARATOR ',') as userscore,tbl1.usercollec_username,tbl2.usertotalscore, tbl2.userimg from (SELECT usercollec_room,usercollec_usersocketid,usercollec_username,usercollec_imgval,sum(usercollec_img_count) as usercollec_img_count,sum(usercollec_user_score) as userscore FROM userpaircollection  WHERE usercollec_room ='"+currentroomid+"'  group by usercollec_usersocketid,usercollec_username,usercollec_imgval,usercollec_room order by usercollec_username) tbl1 inner join (select usercollec_usersocketid,sum(usercollec_user_score) as usertotalscore,user_info_img as userimg from userpaircollection INNER JOIN pairmania_user_info ON pairmania_id = usercollec_pairmania_id where usercollec_room='"+currentroomid+"' group by usercollec_usersocketid) tbl2 on tbl1.usercollec_usersocketid=tbl2.usercollec_usersocketid group by tbl1.usercollec_usersocketid order by tbl2.usertotalscore desc", function (err, row, fields) {
 			if (err) throw err;
 					console.log("Display Final Result : "+row.length);
 					
-					io.sockets.in(currentroomid).emit('writeFinalResult', row);
+					io.sockets.in(currentroomid).emit( 'writeFinalResult', row);
 					rooms = rooms.filter(function(item){ 
 							return (item.roomid !== currentroomid); 
 						});	
 			});
 	});
+	 
 	socket.on('restartGame', function(newroom) {
-        //var oldroom;
+		var isrestart=[];
+        var restartPlayer={};
+		var percentage=0;
+		//var oldroom;
         //oldroom = socket.room;
         //socket.leave(socket.room);
         //socket.join(newroom.roomname);
 		console.log('joined room : ' + newroom.roomname);
 		console.log('joined room limit : ' + newroom.roomlimit);
-        socket.room = newroom.roomid;
-        
-		socket.username = newroom.Playerusername;
-		
-		// add the client's username to the global list
+       
+		if(socket.room==newroom.roomid){
+				restartPlayer={
+				roomid:newroom.roomid,
+				roomname:newroom.roomname,
+				pairmania_id : newroom.pairmania_id,
+				PlayerSocketId : newroom.PlayerSocketId,
+				Playerusername : newroom.Playerusername,
+				Playerimg : newroom.Playerimg	
+			};
+			restartrooms.push(restartPlayer);
+			socket.room = newroom.roomid;
+			socket.username = newroom.Playerusername;
+			
+			// add the client's username to the global list
 		//usernames[username] = newroom.PlayerSocketId;
-	
-		  //Send this event to everyone in the room.
-		io.sockets.in(socket.room).emit('connectToRoom', "You are in room no. "+newroom.roomname+'('+newroom.roomid+')');
-		// echo to room 1 that a person has connected to their room
-		socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.username + ' has connected to this room');
-		socket.broadcast.to(socket.room).emit('updateplayers', players, newroom);
-		socket.broadcast.to(socket.room).emit('onlineplayers', onlineplayers);
-		socket.emit('onlineplayers', onlineplayers);
-		socket.emit('updateplayers', players, newroom);
-		socket.emit('showgamearea');
+		isrestart = restartrooms.filter(function(item){ 
+					//console.log('winner player with filter-->>'+item);
+					 return (item.roomid == socket.room); 
+				});	 
+				
+			percentage = Math.round((isrestart.length)/(newroom.roomlimit)*100);	
+			console.log('percentage '+ percentage);
+			socket.broadcast.to(socket.room).emit('playagain', restartPlayer);
+			
+			if(percentage>=65){
+				
+				//Send this event to everyone in the room.
+				io.sockets.in(socket.room).emit('connectToRoom', "You are in room no. "+newroom.roomname+'('+newroom.roomid+')');
+				// echo to room 1 that a person has connected to their room
+				socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', socket.username + ' has connected to this room');
+				socket.broadcast.to(socket.room).emit('onlineplayers', onlineplayers);
+				socket.emit('onlineplayers', onlineplayers);
+				socket.broadcast.to(socket.room).emit('updateplayers', players, newroom);
+				socket.emit('updateplayers', players, newroom);
+				
+				socket.emit('showgamearea');
+				restartrooms=restartrooms.filter(function(item){ 
+					//console.log('winner player with filter-->>'+item);
+					 return (item.roomid !== socket.room); 
+				});	 
+			}
+		}
 	});
 	
+	socket.on('leaveRoom', function(data){
+		var player={
+				"player" : data.player,
+				"Playerimg" : data.Playerimg,
+				"pairmania_id" : data.pairmania_id,
+				"PlayerSocketId" : data.PlayerSocketId
+			}
+			
+		onlineplayers.push(player);
+		socket.broadcast.to(socket.room).emit('updatechat', 'SERVER ', socket.username+' has left the game');
+		socket.leave(socket.room);
+	});
 	
 	socket.on('disconnect', function(){
 		
@@ -762,13 +882,264 @@ io.sockets.on('connection', function (socket) {
 		socket.broadcast.to(socket.room).emit('updatechat', 'SERVER ', socket.username+' has left the game');
 		socket.broadcast.to(socket.room).emit('updateplayers', players ,room[0]);
 		socket.emit('updateplayers', players ,room[0]);
-		socket.emit('showplayercount', onlineplayers);
+		socket.broadcast.emit('onlineplayers', onlineplayers);
 		socket.broadcast.emit('showplayercount', onlineplayers);
 		
 		// echo globally that this client has left
 		//socket.broadcast.emit('updatechat', 'SERVER', socket.username + ' has disconnected');
 		socket.leave(socket.room);
 			
+	});
+	/****************************************Battle********************************************************/
+	
+	socket.on('battleplay', function(data) {
 		
+		console.log( "battle Play Area...");		
+		var imgscore=0;
+		var imgvalue=0;
+		var battleplayer='';
+		socket.username = data.Playerusername;
+		if(!battleplaycount){
+			
+			var playerlimit = 2;
+			
+			var roomid = new Date().valueOf();
+			battleplayroomid= roomid*(Math.round(Math.random()*100) + 1); 
+			battleplayroom={
+							"roomid":battleplayroomid,
+							"roomname":'Battle Play',
+							"roomlimit":playerlimit,
+							"status" :'ready',
+							"roompassword":'na'
+						}
+						
+			socket.room=battleplayroomid;	
+			battleplaycount = battleplaycount+1;
+			
+			battlerooms.push(battleplayroom);
+			joinbattleplay(battleplayroom,data);
+		
+		}else if((battleplaycount > 0) && (battleplaycount<=2)) {
+			//var roomlen = io.sockets.adapter.rooms[''+quickplayroomid+''].length;
+			var check=0;
+			for(var i=0;i<battlerooms.length;i++){
+				
+				if(battlerooms[i].roomid==battleplayroomid && battlerooms[i].status!='started'){
+					
+						joinbattleplay(battlerooms[i],data);
+						battleplaycount = battleplaycount+1;
+						check =1;
+				}
+			}
+			
+			if(check==0){
+				
+						battleplaycount=0;
+						socket.emit('startbattlereplay',{
+							battleplaycount:battleplaycount
+						})
+			}	
+			
+			if(battleplaycount==2){
+				battleplaycount=0;
+			}
+			//console.log(quickplaycount);
+		}	
+	});
+	
+	socket.on('battlereplay', function(data) {
+		
+		console.log( "Battle RePlay Area..."+data.battleplaycount);
+		socket.username = data.Playerusername;
+		if(!data.battleplaycount){
+			
+			battleplayroom='';
+			var playerlimit = 2;
+			var roomid = new Date().valueOf();
+			battleplayroomid= roomid*(Math.round(Math.random()*100) + 1); 
+			battleplayroom={
+							"roomid":battleplayroomid,
+							"roomname":'Quick Play',
+							"roomlimit":playerlimit,
+							"status" :'ready',
+							"roompassword":'na'
+						}
+			
+			socket.room=battleplayroomid;	
+			battleplaycount = battleplaycount+1;
+	
+			battlerooms.push(battleplayroom);
+			joinbattleplay(battleplayroom,data);
+		}	
+	});
+	
+	function joinbattleplay(newroom,data){	
+	
+		var battleplayer={};
+		var oldroom;
+		
+		battleplayer = battleplayers.filter(function(item){ 
+					 return (item.pairmania_id == data.pairmania_id); 
+				});
+		
+		console.log('battleplayer.length'+battleplayer.length);		
+		
+		if(battleplayer.length>0){	
+			battleplaycount = 1;
+			battleplayers=battleplayers.filter(function(item){ 
+					 return (item.pairmania_id !== data.pairmania_id); 
+				});
+		}
+		oldroom = socket.room;
+        socket.leave(socket.room);
+        socket.join(newroom.roomid);
+		console.log('joined room : ' + newroom.roomid);
+		console.log('joined room : ' + newroom.roomname);
+		console.log('joined room limit : ' + newroom.roomlimit);
+		
+        socket.broadcast.to(oldroom).emit('updatechat', 'SERVER', data.Playerusername + ' has left this room');
+        socket.room = newroom.roomid;
+       
+	    con.query("SELECT GROUP_CONCAT(usercollec_imgval SEPARATOR ',') as usercollec_imgval,GROUP_CONCAT(usercollec_img_count SEPARATOR ',') as usercollec_img_count,GROUP_CONCAT(usercollec_user_score SEPARATOR ',') as usercollec_user_score FROM (select usercollec_imgval , usercollec_img_count, usercollec_user_score  from userpaircollection WHERE usercollec_pairmania_id ="+data.pairmania_id+" order by rand() limit 10  ) tbl ", function (err, row1, fields) {
+			if (err) throw err;
+				imgscore=row1[0].usercollec_user_score;
+				imgvalue=row1[0].usercollec_imgval;
+			    imgpaircnt=row1[0].usercollec_img_count;
+			battleplayer = {
+				Playerusername : data.Playerusername, 
+				Playerimg : data.Playerimg, 
+ 				pairmania_id : data.pairmania_id,
+				PlayerSocketId : data.PlayerSocketId,
+				imgvalue : imgvalue,
+				imgscore : imgscore,
+				imgpaircnt:imgpaircnt,
+				roomid : newroom.roomid,
+				roomname : newroom.roomname	
+			}
+				battleplayers.push(battleplayer);
+				console.log("You are in room no. "+newroom.roomname+" ("+newroom.roomid+"   "+imgpaircnt+")");
+				io.sockets.in(socket.room).emit('connectToRoom', "You are in room no. "+newroom.roomname+" ("+newroom.roomid+"   "+imgpaircnt+")");
+				// echo to room 1 that a person has connected to their room
+				socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', battleplayer.Playerusername + ' has connected to this room');
+				socket.emit('onlinebattleplayers', onlinebattleplayers);
+				socket.broadcast.to(socket.room).emit('updateplayers', battleplayers, newroom);
+				socket.emit('onlineplayers', onlineplayers);
+				socket.emit('updateplayers', battleplayers, newroom);
+				socket.emit('showgamearea');
+			
+		    });
+	}
+	
+	socket.on('battleStarted', function (data) { 
+		socket.broadcast.to(data.PlayerSocketId).emit('sendbattleImg',data);
+	
+		for(var i=0;i<battlerooms.length;i++){
+			if(battlerooms[i].roomid==data.roomid){
+				
+				rooms.splice(i, 1);
+				
+			}
+		}			
+			var	updatedbattleroom = {
+				roomid:data.roomid,
+				roomname:data.roomname,
+				roomlimit:data.roomlimit,
+				imgvalue : data.imgvalue, 
+				imgscore : data.imgscore,
+				imgpaircnt : data.imgpaircnt,
+				status : data.status,	
+				roompassword:data.roompassword
+			}	
+		battlerooms.push(updatedbattleroom);
+	});
+	 
+	 socket.on('battlewinner', function (data) { 
+		if(data.status=='win'){
+			if(data.playertype=='opp'){
+				
+				socket.broadcast.to(data.winner.roomid).emit('disableplayer',data.loser.PlayerSocketId);
+				socket.emit('disableplayer',data.winner.PlayerSocketId);
+				socket.broadcast.to(data.winner.PlayerSocketId).emit('showbattlewinner',data.winner,data.loser);
+				socket.emit('showbattlewinner',data.winner,data.loser);
+				
+				for (var i=0;i<data.loserimgcol.length;i++){
+					con.query("INSERT into userpaircollection(usercollec_pairmania_id,usercollec_imgval, usercollec_img_count,usercollec_user_score,usercollec_username,usercollec_usersocketid,usercollec_room,usercollec_user_ipaddr) VALUES("+data.winner.pairmania_id+","+data.loserimgcol[i].imgvalue+","+data.loserimgcol[i].imgpaircnt+","+data.loserimgcol[i].imgscore+",'"+data.winner.Playerusername+"','"+data.winner.PlayerSocketId+"','"+data.winner.roomid+"','"+ip.address()+"')");
+					con.query("DELETE FROM userpaircollection WHERE usercollec_pairmania_id = "+data.loser.pairmania_id+" and usercollec_imgval="+data.loserimgcol[i].imgvalue+" and usercollec_user_score="+data.loserimgcol[i].imgscore+"");
+					con.query("UPDATE pairmania_user_info SET user_info_score = user_info_score - "+data.loserimgcol[i].imgscore+", user_info_pair_cnt=user_info_pair_cnt-"+data.loserimgcol[i].imgpaircnt+" WHERE pairmania_id = "+data.loser.pairmania_id+" ");
+					con.query("UPDATE pairmania_user_info SET user_info_score = user_info_score + "+data.loserimgcol[i].imgscore+", user_info_pair_cnt=user_info_pair_cnt+"+data.loserimgcol[i].imgpaircnt+" WHERE pairmania_id = "+data.winner.pairmania_id+" ");
+				}
+				
+				console.log(data.playertype+'-----'+data.winner.PlayerSocketId);
+				
+				socket.emit('recreatebattleroom', data.loser);
+				socket.broadcast.to(data.winner.PlayerSocketId).emit('recreatebattleroom', data.winner);
+				
+			}else if(data.playertype=='me'){
+				
+				socket.emit('disableplayer',data.loser.PlayerSocketId);
+				socket.broadcast.to(data.winner.roomid).emit('disableplayer',data.winner.PlayerSocketId);
+				
+				socket.broadcast.to(data.loser.PlayerSocketId).emit('showbattlewinner',data.winner,data.loser);
+				socket.emit('showbattlewinner',data.winner,data.loser);
+				
+				
+				for (var i=0;i<data.loserimgcol.length;i++){
+					con.query("INSERT into userpaircollection(usercollec_pairmania_id,usercollec_imgval, usercollec_img_count,usercollec_user_score,usercollec_username,usercollec_usersocketid,usercollec_room,usercollec_user_ipaddr) VALUES("+data.winner.pairmania_id+","+data.loserimgcol[i].imgvalue+","+data.loserimgcol[i].imgpaircnt+","+data.loserimgcol[i].imgscore+",'"+data.winner.Playerusername+"','"+data.winner.PlayerSocketId+"','"+data.winner.roomid+"','"+ip.address()+"')");
+					con.query("DELETE FROM userpaircollection WHERE usercollec_pairmania_id = "+data.loser.pairmania_id+" and usercollec_imgval="+data.loserimgcol[i].imgvalue+" and usercollec_user_score="+data.loserimgcol[i].imgscore+"");
+					con.query("UPDATE pairmania_user_info SET user_info_score = user_info_score - "+data.loserimgcol[i].imgscore+", user_info_pair_cnt=user_info_pair_cnt-"+data.loserimgcol[i].imgpaircnt+" WHERE pairmania_id = "+data.loser.pairmania_id+" ");
+					con.query("UPDATE pairmania_user_info SET user_info_score = user_info_score + "+data.loserimgcol[i].imgscore+", user_info_pair_cnt=user_info_pair_cnt+"+data.loserimgcol[i].imgpaircnt+" WHERE pairmania_id = "+data.winner.pairmania_id+" ");
+					console.log("data.loserimgcol[i].imgpaircnt"+data.loserimgcol[i].imgpaircnt);
+				}
+				
+				console.log(data.playertype+'-----'+data.loser.PlayerSocketId);
+				
+				socket.broadcast.to(data.loser.PlayerSocketId).emit('recreatebattleroom',  data.loser);
+				socket.emit('recreatebattleroom', data.winner);
+			}
+		}
+	});
+	
+	socket.on('rejoinbattle', function (data) { 
+		
+		console.log('rejoining battle...'+data.PlayerSocketId+'....'+data.roomid);
+		var player = battleplayers.filter(function(item){ 
+				 return (item.PlayerSocketId == data.PlayerSocketId); 
+			});
+		battleplayers = battleplayers.filter(function(item){ 
+				 return (item.PlayerSocketId !== data.PlayerSocketId); 
+			});
+				
+		var battleplayer={};
+		
+	    con.query("SELECT GROUP_CONCAT(usercollec_imgval SEPARATOR ',') as usercollec_imgval,GROUP_CONCAT(usercollec_img_count SEPARATOR ',') as usercollec_img_count,GROUP_CONCAT(usercollec_user_score SEPARATOR ',') as usercollec_user_score FROM (select usercollec_imgval , usercollec_img_count, usercollec_user_score  from userpaircollection WHERE usercollec_pairmania_id ="+data.pairmania_id+" order by rand() limit 10  ) tbl ", function (err, row1, fields) {
+			if (err) throw err;
+				imgscore=row1[0].usercollec_user_score;
+				imgvalue=row1[0].usercollec_imgval;
+			    imgpaircnt=row1[0].usercollec_img_count;
+			
+			battleplayer = {
+				Playerusername : data.Playerusername, 
+				Playerimg : data.Playerimg, 
+ 				pairmania_id : data.pairmania_id,
+				PlayerSocketId : data.PlayerSocketId,
+				imgvalue : imgvalue,
+				imgscore : imgscore,
+				imgpaircnt:imgpaircnt,
+				roomid : newroom.roomid,
+				roomname : newroom.roomname	
+			}
+			
+			var newroom={
+				roomid: player[0].roomid,
+				roomname:player[0].roomname,
+				status : 'ready',
+				roomlimit:2
+			}
+			
+			battleplayers.push(battleplayer);
+		    console.log('reconnected to'+newroom);
+			socket.broadcast.to(data.roomid).emit('updateplayers', battleplayers, newroom);
+			socket.emit('updateplayers', battleplayers, newroom);
+		});
 	});
 });
