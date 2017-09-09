@@ -1,7 +1,7 @@
 <html>
 <head>
 <title>PAIR MANIA</title>
-
+	<meta name="viewport" content="width=1024">
     <!-- Bootstrap CSS -->
 	<link type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
     <!-- font Awesome CSS -->
@@ -18,9 +18,7 @@
 	<script src="https://cdn.rawgit.com/julianshapiro/velocity/master/velocity.min.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
-	
-
-    <!-- Bootstrap JavaScript -->
+	<!-- Bootstrap JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <!-- Custom JavaScript -->	
@@ -64,10 +62,6 @@ a:active,a:hover{outline-width:0}abbr[title]{border-bottom:none;text-decoration:
 </style>
 
 	<style>
-		.div1 {
-			border: 1px solid #a1a1a1;
-		}
-		
 		.borderRed{
 			border: 1px solid red;
 		}
@@ -98,12 +92,6 @@ a:active,a:hover{outline-width:0}abbr[title]{border-bottom:none;text-decoration:
 		display: none;
 	}
 	
-
-.swiper-container {
-        width: 100%;
-        height: 380px;
-        margin: 10px auto;
-    }
 	</style>
 	<link type="text/css" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" rel="stylesheet" /> 
 	
@@ -195,35 +183,29 @@ function closescoreNav() {
 			<div class="panel-body">	
 			<div  class="row">
 				<div id="targetOutcome" class="col-md-12 col-sm-12 col-xs-12"></div>
-			</div>
-			
-			<div  class="row">
-				<div id="writeFinalResult" class="col-md-12">
-				</div>
+				<div id="writeFinalResult" class="col-md-12 col-sm-12 col-xs-12"></div>
 				<div class="col-md-12 col-sm-12 col-xs-12">
 				<div class="swiper-container">
 					<div id="players" class="swiper-wrapper"></div>
 					<!-- Add Pagination -->
 					<div class="swiper-pagination"></div>
 				</div>
-				<script>
-					var swiper = new Swiper('.swiper-container', {
-						pagination: '.swiper-pagination',
-						slidesPerView: 'auto',
-						nextButton: '.swiper-button-next',
-						prevButton: '.swiper-button-prev',
-						paginationClickable: true,
-						spaceBetween: 30,
-						grabCursor: true,
-						freeMode: true
-					});
-				</script>
-			</div>
-				<div class="col-md-12 col-sm-12 col-xs-12 text-center" id="paircomplete-alert">
-					
+					<script>
+						var swiper = new Swiper('.swiper-container', {
+							pagination: '.swiper-pagination',
+							slidesPerView: 'auto',
+							nextButton: '.swiper-button-next',
+							prevButton: '.swiper-button-prev',
+							paginationClickable: true,
+							spaceBetween: 30,
+							grabCursor: true,
+							freeMode: true
+						});
+					</script>
 				</div>
+				<div class="col-md-12 col-sm-12 col-xs-12 text-center" id="paircomplete-alert"></div>
 				<div class="col-md-12 col-sm-12 col-xs-12" id="getAllpairs">		
-					<div class="col-md-12 text-center" id="currentuser" style="margin-top:10px;">
+					<div class="col-md-12 col-sm-12 col-xs-12 text-center" id="currentuser" style="margin-top:10px;">
 						<span id="playerneeded" style="font-size:18px;"></span>
 					</div>
 				</div>
