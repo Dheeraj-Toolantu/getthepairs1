@@ -24,6 +24,7 @@
     <!-- Custom JavaScript -->	
 	<script type="text/javascript" src="/js/TimeCircles.js"></script>
 	<script type="text/javascript" src="/js/counter.js"></script>
+	<script src="/js/swiper.jquery.js"></script>
 	<script src="/js/swiper.min.js"></script>
     
 	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -110,9 +111,6 @@ a:active,a:hover{outline-width:0}abbr[title]{border-bottom:none;text-decoration:
 	.swiper-container{
 		height: 300px;
 	}
-		
-		
-	
 	</style>
 	<link type="text/css" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" rel="stylesheet" /> 
 	
@@ -141,35 +139,35 @@ a:active,a:hover{outline-width:0}abbr[title]{border-bottom:none;text-decoration:
 <% } else { %>
 <input type="hidden" id="pairmania_userid" name="pairmania_userid" value="<%= user.pairmania_id %>"/>
 <div id="gamearea" class="hidepannel">
-<div id="mySidenav" class="w3-sidebar w3-bar-block w3-border-right sidenav" style="display:none">
-  <div class="row" onclick="closeNav()">
-		<div style="padding:5px 10px 5px 10px;background:#616161!important;color:#fff!important">
-		<div class="media-left">
-			<a href="javascript:void(0)">
-				<img id="profile" class="media-object" src="<%= user.photos %>" alt="profile picture" height=50 >
-			</a>
+	<div id="mySidenav" class="w3-sidebar w3-bar-block w3-border-right sidenav" style="display:none">
+		<div class="row" onclick="closeNav()">
+			<div style="padding:5px 10px 5px 10px;background:#616161!important;color:#fff!important">
+			<div class="media-left">
+				<a href="javascript:void(0)">
+					<img id="profile" class="media-object" src="<%= user.photos %>" alt="profile picture" height=50 >
+				</a>
+			</div>
+			<div class="media-body">
+				<h4><strong class="singleuser"><%= user.displayName %></strong></h4>
+			</div>
+			<div class="media-right">
+				<a href="javascript:void(0)" onclick="closeNav()" style="color:#fff!important"><i class="glyphicon glyphicon-remove-sign"></i></a>
+			</div>
+			</div>
 		</div>
-		<div class="media-body">
-			<h4><strong class="singleuser"><%= user.displayName %></strong></h4>
-		</div>
-		<div class="media-right">
-			<a href="javascript:void(0)" onclick="closeNav()" style="color:#fff!important"><i class="glyphicon glyphicon-remove-sign"></i></a>
-		</div>
-		</div>
-  </div>
-  <div class="row" id="onlineplayers"></div>
-</div>
+		<div class="row" id="onlineplayers"></div>
+	</div>
 
-<div id="mySidenav_scorecard" class="w3-sidebar w3-bar-block w3-border-right sidenav" style="display:none">
-    <div class="row" onclick="closescoreNav()">
-		<div style="padding:5px 5px 5px 15px;background:#616161!important;color:#fff!important">
-			<h4>Players ScoreCard&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-remove-sign"></span></h4>
+	<div id="mySidenav_scorecard" class="w3-sidebar w3-bar-block w3-border-right sidenav" style="display:none">
+		<div class="row" onclick="closescoreNav()">
+			<div style="padding:5px 5px 5px 15px;background:#616161!important;color:#fff!important">
+				<h4>Players ScoreCard&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-remove-sign"></span></h4>
+			</div>
+	    </div>
+		<div class="row" id="displayResult" style="max-height:700px;overflow-y:scroll;">
+		
 		</div>
-  </div>
-  <div class="row" id="displayResult" style="max-height:700px;overflow-y:scroll;">
-	
-  </div>
-</div>
+	</div>
 
 <script>
 function openNav() {
@@ -187,10 +185,10 @@ function closescoreNav() {
 }
 </script>
 
-<div id="main">
-  	<div class="panel panel-default">
-		<div class="pull-right" id="CountDownTimer" data-timer="300" style="width:auto;height:50px;margin-right:5px;"></div>
-			<div class="panel-heading" style="padding:0px;">	
+	<div id="main">
+		<div class="panel panel-default">
+			<div class="panel-heading" style="padding:0px;overflow:hidden;">
+				<div class="pull-right" id="CountDownTimer" data-timer="300" style="width:auto;height:48px;margin-right:5px;margin-top:-5px;"></div>
 				<div class="panel-title">
 					<ul class="nav nav-pills" style="height:35px;">
 					  <li role="presentation"><a id="menuToggler" type="button" href="javascript:void(0);" onclick="openNav()" title="Invite Player"><span class="glyphicon glyphicon-plus"></span></a></li>
@@ -208,20 +206,20 @@ function closescoreNav() {
 							<div id="players" class="swiper-wrapper"></div>
 							<!-- Add Pagination -->
 							<div class="swiper-pagination"></div>
+							 <!-- Add Arrows -->
 						</div>
 						<script>
 							var swiper = new Swiper('.swiper-container', {
 								pagination: '.swiper-pagination',
 								slidesPerView: 'auto',
-								nextButton: '.swiper-button-next',
-								prevButton: '.swiper-button-prev',
 								paginationClickable: true,
 								spaceBetween: 30,
 								grabCursor: true,
 								freeMode: true
 							});
+		
 						</script>
-					</div>	
+					</div>
 				</div>	
 				<div class="text-center"><div id="restartGame" style="margin:5px;"></div></div> 
 				<div class="col-md-12 col-xs-12 col-sm-12 text-center" id="paircomplete-alert"></div>
@@ -263,9 +261,10 @@ function closescoreNav() {
     </div>
 </div>
 
-<div id="homearea" class="panel panel-default">
+	<div id="homearea" class="panel panel-default">
 		<div class="panel-heading">
-		<h3 class="panel-title">WELCOME TO <strong>PAIR-MANIA GAME</strong><b class="pull-right">&nbsp;<a href="javascript:void(0)">PLAYERS ONLINE <span class="badge" id="allcount"></span></a></b></h3>
+			<b class="pull-right">&nbsp;<a href="javascript:void(0)">PLAYERS ONLINE <span class="badge" id="allcount"></span></a></b>
+			<h3 class="panel-title">WELCOME TO <strong>PAIRMANIA GAME</strong></h3>
 		</div>
 		<div class="panel-body">
 		<div class="row">
@@ -289,9 +288,9 @@ function closescoreNav() {
 								<div class="panel-heading">
 									<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove-sign"></span></button>
 									<div class="btn-group" role="group" aria-label="Large button group"> 
-										<button type="button" id="view_my_pairs" class="btn btn-success">VIEW MY PAIRS</button> 
-										<button type="button" class="btn btn-info">VIEW TOP PLAYERS</button> 
-										<button type="button" class="btn btn-default">VIEW TOP PAIRS</button> 
+										<button type="button" id="view_my_pairs" class="btn btn-md btn-sm btn-xs btn-success">VIEW MY PAIRS</button> 
+										<button type="button" class="btn btn-md btn-sm btn-xs btn-info">VIEW TOP PLAYERS</button> 
+										<button type="button" class="btn btn-md btn-sm btn-xs btn-default">VIEW TOP PAIRS</button> 
 									</div>
 								</div>
 								<div class="row" id="showmypairs" style="padding:5px;">
@@ -384,8 +383,7 @@ function closescoreNav() {
 	<script>
 	$(document).ready(function(){
 	    socket.on('connect', function(){
-		
-		 	playername=$('.singleuser').html();
+			playername=$('.singleuser').html();
 			playerimg = $('#profile').attr('src');
 			pairmania_userid = $('#pairmania_userid').attr('value');
 			socket.emit('adduser',{
@@ -473,9 +471,8 @@ function closescoreNav() {
 			 }
 		}
 </script>
-
-	
-<% } %>
 <script src="/js/client.js"></script>
+<% } %>
+
 </body>
 </html>
