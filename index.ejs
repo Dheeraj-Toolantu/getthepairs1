@@ -192,18 +192,17 @@ function closescoreNav() {
 		<div class="pull-right" id="CountDownTimer" data-timer="300" style="width:auto;height:50px;margin-right:5px;"></div>
 			<div class="panel-heading" style="padding:0px;">	
 				<div class="panel-title">
-				<ul class="nav nav-pills" style="height:35px;">
-				  <li role="presentation"><a id="menuToggler" type="button" href="javascript:void(0);" onclick="openNav()" title="Invite Player"><span class="glyphicon glyphicon-plus"></span></a></li>
-				  <li role="presentation"><a type="button" href="javascript:void(0);" onclick="openscoreNav()" title="View Scorecard"><span class="glyphicon glyphicon-list-alt"></span></a></li>
-				  <li role="presentation"><a type="button" href="javascript:void(0);" title="Player joined"><span class="glyphicon glyphicon-user"></span><span class="badge" id="count" style="line-height:none;"></span></a></li>
-				</ul>
-					<div id="restartGame" style="padding-top:5px;"></div> 
+					<ul class="nav nav-pills" style="height:35px;">
+					  <li role="presentation"><a id="menuToggler" type="button" href="javascript:void(0);" onclick="openNav()" title="Invite Player"><span class="glyphicon glyphicon-plus"></span></a></li>
+					  <li role="presentation"><a type="button" href="javascript:void(0);" onclick="openscoreNav()" title="View Scorecard"><span class="glyphicon glyphicon-list-alt"></span></a></li>
+					  <li role="presentation"><a type="button" href="javascript:void(0);" title="Player joined"><span class="glyphicon glyphicon-user"></span><span class="badge" id="count" style="line-height:none;"></span></a></li>
+					</ul>
 				</div>
 			</div>
 			<div class="panel-body">	
 				<div id="targetOutcome"></div>
 				<div id="writeFinalResult" class="col-md-12 col-xs-12 col-sm-12"></div>
-				
+				<div class="row">
 					<div class="col-md-12 col-xs-12 col-sm-12">
 						<div class="swiper-container">
 							<div id="players" class="swiper-wrapper"></div>
@@ -223,9 +222,10 @@ function closescoreNav() {
 							});
 						</script>
 					</div>	
-				
+				</div>	
+				<div class="text-center"><div id="restartGame" style="margin:5px;"></div></div> 
 				<div class="col-md-12 col-xs-12 col-sm-12 text-center" id="paircomplete-alert"></div>
-				<div id="getAllpairs">		
+				<div class="row" id="getAllpairs">		
 					<div class="text-center" id="currentuser"></div>
 				</div>
 				<div class="row">
