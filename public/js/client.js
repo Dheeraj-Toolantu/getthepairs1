@@ -43,7 +43,7 @@
 				playerPlaying.push(value);
 				if(value.PlayerSocketId!=socket.id){
 				    
-					$('#players').append('<ul class="col-md-4 col-sm-4 col-xs-6 list-group" style="z-index:0"><li class="list-group-item"><div class="media"><div class="media-left"><img src="'+value.Playerimg+'" class="media-object" ></div><div class="media-body"><h4 class="media-heading">' + value.player + '</h4></div></div></li><li class="list-group-item" id="'+value.PlayerSocketId+'" data-opponant="'+value.player+'" data-opponant-socketId="'+value.PlayerSocketId+'"><div class="'+value.PlayerSocketId+' div1"></div></li></ul>');
+					$('#players').append('<ul class="col-lg-2 col-md-3 col-sm-3 col-xs-6 list-group" style="z-index:0"><li class="list-group-item"><div class="media"><div class="media-left"><img src="'+value.Playerimg+'" class="media-object" ></div><div class="media-body"><h4 class="media-heading">' + value.player + '</h4></div></div></li><li class="list-group-item" id="'+value.PlayerSocketId+'" data-opponant="'+value.player+'" data-opponant-socketId="'+value.PlayerSocketId+'"><div class="'+value.PlayerSocketId+' div1"></div></li></ul>');
 					
 					$( "#"+value.PlayerSocketId ).droppable({
 						  drop: function( event, ui ) {
@@ -85,7 +85,6 @@
 				if(roomdetails.status=='pending' || roomdetails.status=='ready'){
 					
 					$("#currentuser").html("");
-					$("#playerneeded").html("");
 					$('#targetOutcome').html('<ul class="alert alert-danger"><li class = "list-group-item" style="height:70px;"><span id="strtin" class = "badge"></span>Game is going to start in</li></ul>');
 					k=0;
 					
@@ -108,8 +107,7 @@
 							playersocketid:socket.id
 					});
 					console.log('Game is starting in 10 sec...');
-					$('#targetOutcome').html('<div class="alert alert-success" style="font-size:16px">Collect <span class="badge" style="font-size:18px">'+roomdetails.roomlimit+' same pairs</span>&nbsp;<button class="btn btn-xs btn-warning" type="button" data-toggle="modal" data-target=".hint-model">Give me hint</div></div>');
-					
+					$('#targetOutcome').html('<div class="bg-success text-center" style="padding:2px;">Collect <span class="badge" style="font-size:14px">'+roomdetails.roomlimit+' same pairs</span>&nbsp;<button class="btn btn-xs btn-warning" type="button" data-toggle="modal" data-target=".hint-model">Give me hint</div></div>');
 				}
 				});
 				
@@ -159,10 +157,8 @@
 					$("#menuToggler").show(500);
 					$("#currentuser").html("");
 					if((roomdetails.roomlimit - i)>1){
-						//$('#playerneeded').html(+' more players needed to start the game');
 						$('#targetOutcome').html('<div class="alert alert-danger" style="font-size:16px"><span class="badge" style="font-size:18px">'+(roomdetails.roomlimit - i)+'</span> more players needed to start the game</div>');
 					}else if((roomdetails.roomlimit - i)==1){
-						//$('#playerneeded').html('Only '+(roomdetails.roomlimit - i)+' player needed to start the game');
 						$('#targetOutcome').html('<div class="alert alert-warning" style="font-size:16px">Only <span class="badge" style="font-size:18px">'+(roomdetails.roomlimit - i)+'</span> more player needed to start the game</div>');
 					}else if(($("#count").text())<3){
 						$('#targetOutcome').html('<div class="alert alert-danger" style="font-size:16px">It seems that only 2 players are in the Game</div>');
