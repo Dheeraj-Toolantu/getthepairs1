@@ -190,18 +190,15 @@
 			imgscore:data.imgscore,
 			srcsocketid:data.srcsocketId
 		});
-							  
-		//$('#'+data.srcPlayer).html('<img src="swap.jpg" data-val="03" draggable="true" ondragstart="drag(event)" width="69" height="69">');
-		/*$.each(data, function(key, value) {
-			
-			if(value.trgsocketId==socket.id){
-				$('#currentuser').after('<img src="/'+value.imgval+'.jpg" data-val="'+value.imgval+'" draggable="true" ondragstart="drag(event)" width="69" height="69">');
-				$('#'+value.srcsocketId).html('<img src="swap.jpg" data-val="03" draggable="true" ondragstart="drag(event)" width="69" height="69">');
-			//	ischeck 
-			}else if(value.srcsocketId==socket.id){
-				//$('#currentuser').after('<img src="/'+value.imgval+'.jpg" data-val="'+value.imgval+'" draggable="true" ondragstart="drag(event)" width="69" height="69">');
-			}
-		});*/ 
+
+	/*	
+       var maxScrollLeft=$("#players").scrollLeft('#players').prop('scrollWidth') - $("#players").width();
+		var left = $(this).offset().left;
+		var width = $("#players").width();
+		var diff = left - width/2;
+		$("#players").scrollLeft($("#players").scrollLeft()+diff);
+	  */
+		
 	});
 	
 	socket.on('alertWinner', function (data,playerScorecard,pendingPlayers,currentroomname,currentroomid,currentroomlimit) {

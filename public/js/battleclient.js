@@ -69,7 +69,6 @@
 						};
 						
 					battleplayers.push(opponantdetails);
-					
 					$('#players').append('<div class="col-md-6 col-sm-8 col-xs-8"><div class="media"><div class="media-left"><img src="'+value.Playerimg+'" class="media-object"></div><div class="media-body"><h4 class="media-heading">' + value.Playerusername + ' </h4><div  id="'+value.PlayerSocketId+'" data-opponant="'+value.Playerusername+'" data-opponant-socketId="'+value.PlayerSocketId+'"><div class="'+value.PlayerSocketId+' div1"></div></div></div></div></div>');
 					$('#battleplayers').append('<div class="col-md-12" style="margin:10px;"><div class="media"><div class="media-left"><img src="'+value.Playerimg+'" class="media-object thumbnail"></div><div class="media-body"><h4 class="media-heading">' + value.Playerusername + ' </h4><div id="oppbattle"></div></div></div></div>');
 					$( "#"+value.PlayerSocketId ).droppable({
