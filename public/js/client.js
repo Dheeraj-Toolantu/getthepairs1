@@ -43,7 +43,7 @@
 				playerPlaying.push(value);
 				if(value.PlayerSocketId!=socket.id){
 				    
-					$('#players').append('<ul class="col-lg-2 col-md-3 col-sm-3 col-xs-6 list-group" style="z-index:0"><li class="list-group-item"><div class="media"><div class="media-left"><img src="'+value.Playerimg+'" class="media-object" ></div><div class="media-body"><h4 class="media-heading">' + value.player + '</h4></div></div></li><li class="list-group-item" id="'+value.PlayerSocketId+'" data-opponant="'+value.player+'" data-opponant-socketId="'+value.PlayerSocketId+'"><div class="'+value.PlayerSocketId+' div1"></div></li></ul>');
+					$('#players').append('<div class="swiper-slide"><ul class="list-group" style="z-index:0"><li class="list-group-item"><div class="media"><div class="media-left"><img src="'+value.Playerimg+'" class="media-object" ></div><div class="media-body"><h4 class="media-heading">' + value.player + '</h4></div></div></li><li class="list-group-item" id="'+value.PlayerSocketId+'" data-opponant="'+value.player+'" data-opponant-socketId="'+value.PlayerSocketId+'"><div class="'+value.PlayerSocketId+' div1"></div></li></ul></div>');
 					
 					$( "#"+value.PlayerSocketId ).droppable({
 						  drop: function( event, ui ) {
@@ -206,27 +206,39 @@
 	var srctag='';
 	var playercount = $("#count").text();
 	var playerimgcount = data.imgcnt;
+	if(data.status=='done'){
 	    if(data.rank==1){
 		    for(i=1;i<=playerimgcount;i++){
 				srctag=srctag+"<img src='/"+data.imgval+".jpg' height=40>";
 			}
-			$("."+data.srcsocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;"+data.playername+" is the <span class='badge'>"+data.rank+"st</span> winner who made following pairs<br>"+srctag+"<br><br><span class='badge'>Earn : "+data.score+" Coins</span></div>");
+			$("."+data.srcsocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"st</span> winner with<br>"+srctag+"<br><br><span class='badge'>Earn : "+data.score+" Coins</span></div>");
 		}else if(data.rank==2){
 			for(i=1;i<=playerimgcount;i++){
 			   srctag=srctag+"<img src='/"+data.imgval+".jpg' height=40>";
 			}
-			$("."+data.srcsocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;"+data.playername+" is the <span class='badge'>"+data.rank+"nd</span> winner who made following pairs<br>"+srctag+"<br><br><span class='badge'>Earn : "+data.score+" Coins</span></div>");
+			$("."+data.srcsocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"nd</span> winner with<br>"+srctag+"<br><br><span class='badge'>Earn : "+data.score+" Coins</span></div>");
 		}else if(data.rank==3){
 			for(i=1;i<=playerimgcount;i++){
 			   srctag=srctag+"<img src='/"+data.imgval+".jpg' height=40>";
 			}
-			$("."+data.srcsocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;"+data.playername+" is the <span class='badge'>"+data.rank+"rd</span> winner who made follwoing pairs<br>"+srctag+"<br><br><span class='badge'>Earn : "+data.score+" Coins</span></div>");
+			$("."+data.srcsocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"rd</span> winner with<br>"+srctag+"<br><br><span class='badge'>Earn : "+data.score+" Coins</span></div>");
 		}else{
 			for(i=1;i<=playerimgcount;i++){
 			   srctag=srctag+"<img src='/"+data.imgval+".jpg' height=40>";
 			}
-			$("."+data.srcsocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;"+data.playername+" is the <span class='badge'>"+data.rank+"th</span> winner who made follwoing pairs<br>"+srctag+"<br><br><span class='badge'>Earn : "+data.score+" Coins</span></div>");
+			$("."+data.srcsocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"th</span> winner with<br>"+srctag+"<br><br><span class='badge'>Earn : "+data.score+" Coins</span></div>");
 		}
+	}else if(data.status=='ready'){
+		if(data.rank==1){
+		    $("."+data.srcsocketId).html("<div class='alert alert-warning' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;"+data.playername+" is ready with pairs</div>");
+		}else if(data.rank==2){
+			$("."+data.srcsocketId).html("<div class='alert alert-warning' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;"+data.playername+" is ready with pairs</div>");
+		}else if(data.rank==3){
+			$("."+data.srcsocketId).html("<div class='alert alert-warning' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;"+data.playername+" is ready with pairs</div>");
+		}else{
+			$("."+data.srcsocketId).html("<div class='alert alert-warning' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;"+data.playername+" is ready with pairs</div>");
+		}
+	}		
 	   //playerPlaying = pendingPlayers;
 			$.each(countdownarr, function(countkey, countval) {
 				if(countval.playersocketid==data.srcsocketId){
