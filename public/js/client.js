@@ -211,22 +211,22 @@
 		    for(i=1;i<=playerimgcount;i++){
 				srctag=srctag+"<img src='/"+data.imgval+".jpg' height=40>";
 			}
-			$("."+data.srcsocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"st</span> winner with<br>"+srctag+"<br><br><span class='badge'>Earn : "+data.score+" Coins</span></div>");
+			$("."+data.srcsocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"st</span> winner with <span class='badge'>"+data.score+" Coins</span><br>"+srctag+"</div>");
 		}else if(data.rank==2){
 			for(i=1;i<=playerimgcount;i++){
 			   srctag=srctag+"<img src='/"+data.imgval+".jpg' height=40>";
 			}
-			$("."+data.srcsocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"nd</span> winner with<br>"+srctag+"<br><br><span class='badge'>Earn : "+data.score+" Coins</span></div>");
+			$("."+data.srcsocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"nd</span> winner with <span class='badge'>"+data.score+" Coins</span><br>"+srctag+"</div>");
 		}else if(data.rank==3){
 			for(i=1;i<=playerimgcount;i++){
 			   srctag=srctag+"<img src='/"+data.imgval+".jpg' height=40>";
 			}
-			$("."+data.srcsocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"rd</span> winner with<br>"+srctag+"<br><br><span class='badge'>Earn : "+data.score+" Coins</span></div>");
+			$("."+data.srcsocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"rd</span> winner with <span class='badge'>"+data.score+" Coins</span><br>"+srctag+"</div>");
 		}else{
 			for(i=1;i<=playerimgcount;i++){
 			   srctag=srctag+"<img src='/"+data.imgval+".jpg' height=40>";
 			}
-			$("."+data.srcsocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"th</span> winner with<br>"+srctag+"<br><br><span class='badge'>Earn : "+data.score+" Coins</span></div>");
+			$("."+data.srcsocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"th</span> winner with <span class='badge'>"+data.score+" Coins</span><br>"+srctag+"</div>");
 		}
 	}else if(data.status=='ready'){
 		if(data.rank==1){
