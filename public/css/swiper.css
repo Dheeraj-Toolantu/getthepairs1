@@ -14,7 +14,7 @@
  */
 .swiper-container {
   width: 100%;	
-  margin: 10px auto;	
+  margin: auto;	
   position: relative;
   overflow: hidden;
   /* Fix of Webkit flickering */
