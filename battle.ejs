@@ -189,14 +189,13 @@ function closescoreNav() {
 
 <div id="main">
   	<div class="panel panel-default">
-		<div class="pull-right" id="CountDownTimer" data-timer="300" style="width:auto;height:50px;margin-right:5px;"></div>
-			<div class="panel-heading">	
+		    <div class="panel-heading">	
+			    <div class="pull-right" id="CountDownTimer" data-timer="300" style="width:auto;height:50px;margin-right:5px;"></div>
 				<h3 class="panel-title">
-					<div class="btn-group btn-group-xs" role="group" aria-label="small button group"> 
-						<button id="menuToggler" type="button" class="btn btn-default" href="javascript:void(0);" onclick="openNav()"><span  style="cursor:pointer" >&#9776; Invite Players</span></button> 
-						<button type="button" class="btn btn-success" onclick="openscoreNav()"><span class="glyphicon glyphicon-list-alt"></span>&nbsp;Score Card</button> 
-						<button type="button" class="btn btn-info"><span class="glyphicon glyphicon-user"></span>&nbsp;Players <span class="badge" id="count"></span></button> 
-					</div>
+				    <ul class="nav nav-pills" style="height:35px;">
+					  <li role="presentation"><a id="menuToggler" type="button" href="javascript:void(0);" onclick="openNav()" title="Invite Player"><span class="glyphicon glyphicon-plus"></span></a></li>
+					  <li role="presentation"><a type="button" href="javascript:void(0);" title="Player joined"><span class="glyphicon glyphicon-user"></span><span class="badge" id="count" style="line-height:none;"></span></a></li>
+					</ul>
 				</h3>
 			</div>
 			<div class="panel-body">	
@@ -206,13 +205,10 @@ function closescoreNav() {
 				<div id="targetOutcome" class="col-md-12 col-sm-12 col-xs-12"></div>
 			</div>
 			<div  class="row">
-				<div id="writeFinalResult" class="col-md-12">
-				</div>
+				<div id="writeFinalResult" class="col-md-12"></div>
 				<div class="col-md-12 col-sm-12 col-xs-12">
 				<div class="swiper-container">
-					<div id="players" class="swiper-wrapper"></div>
-					<!-- Add Pagination -->
-					<div class="swiper-pagination"></div>
+					<div id="players"></div>
 				</div>
 				<script>
 					var swiper = new Swiper('.swiper-container', {
@@ -235,9 +231,9 @@ function closescoreNav() {
 						grabCursor: true
 					});
 					*/
-				
 				</script>
 			</div>
+				<div class="text-center"><div id="restartGame" style="margin:5px;"></div></div> 
 				<div class="col-md-12 col-sm-12 col-xs-12" id="getAllpairs">		
 					<div class="col-md-12 center-text" id="currentuser" style="margin-top:10px;">
 						<span id="playerneeded" style="font-size:18px;"></span>
@@ -250,7 +246,7 @@ function closescoreNav() {
 			<div class="row">
 			  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
 				<div class="input-group">
-				  <input type="text" id="data" class="form-control" placeholder="MESSAGE">
+				  <input type="text" id="data" class="form-control" placeholder="CHAT">
 				  <span class="input-group-btn">
 					 <button class="btn btn-default" id="datasend" type="button">SEND</button>
 				  </span>

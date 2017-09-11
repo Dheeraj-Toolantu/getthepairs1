@@ -246,8 +246,8 @@ function ensureAuthenticated(req, res, next) {
   res.redirect('/login')
 }
 
-server.listen(process.env.PORT || 80 || 3000 || 4000);
-//server.listen(4000);
+//server.listen(process.env.PORT || 80 || 3000 || 4000);
+server.listen(4000);
 
 process.env.PWD = process.cwd()
 	
@@ -704,9 +704,9 @@ io.sockets.on('connection', function (socket) {
 							console.log("1 record updated in pairmania_user_info");
 						});
 						playerScorecard.push(data);
+						socket.emit('disableplayer',playerPlaying);
 					}else if(data.status=='ready'){
 						socket.broadcast.to(currentroomid).emit('alertWinner',data,playerScorecard,playerPlaying,currentroomname,currentroomid,currentroomlimit);
-						socket.emit('disableplayer',playerPlaying);
 						console.log('After updated length'+playerPlaying.length);
 					}
 			});
