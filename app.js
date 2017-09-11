@@ -1,7 +1,6 @@
 var path = require("path");  
 var mysql = require('mysql');
 
-
 var con = mysql.createConnection({
     host: "getthepair.cr1a92pwyyql.us-east-2.rds.amazonaws.com",
     user: "toolantu",
@@ -17,7 +16,6 @@ var con = mysql.createConnection({
     database:"getthepairs"
 });
 */
-
 con.connect(function(err) {
 		  if (err) throw err;
 		  console.log("Connected to db!");
@@ -115,7 +113,7 @@ passport.use(new FacebookStrategy({
 app.get('/loginForm', function(req, res){
 	var tempuser ={
 		"displayName" : req.query.displayName,
-		"photos" : '/profile.png'
+		"photos" : '/profile.png',
 	}
 	
 	var ipaddr = ip.address();
@@ -705,6 +703,7 @@ io.sockets.on('connection', function (socket) {
 						});
 						playerScorecard.push(data);
 						socket.emit('disableplayer',playerPlaying);
+						socket.broadcast.to(currentroomid).emit('alertWinner',data,playerScorecard,playerPlaying,currentroomname,currentroomid,currentroomlimit);
 					}else if(data.status=='ready'){
 						socket.broadcast.to(currentroomid).emit('alertWinner',data,playerScorecard,playerPlaying,currentroomname,currentroomid,currentroomlimit);
 						console.log('After updated length'+playerPlaying.length);
