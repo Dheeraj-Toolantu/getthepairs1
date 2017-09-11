@@ -246,8 +246,8 @@ function ensureAuthenticated(req, res, next) {
   res.redirect('/login')
 }
 
-//server.listen(process.env.PORT || 80 || 3000 || 4000);
-server.listen(4000);
+server.listen(process.env.PORT || 80 || 3000 || 4000);
+//server.listen(4000);
 
 process.env.PWD = process.cwd()
 	
