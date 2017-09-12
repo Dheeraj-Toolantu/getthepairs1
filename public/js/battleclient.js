@@ -15,7 +15,7 @@
 	var opponantbattleimgs =[];
 	var opponantbattleimg={};
 	var mybattleimg={};
-	
+	var opponantsocketId=0;
 	// listener, whenever the server emits 'updatechat', this updates the chat body
 	socket.on('updatechat', function (username, data) {
 		$('#conversation').append('<b>'+username + ':</b> ' + data + '<br>');
@@ -30,15 +30,16 @@
 		$.each(onlinebattleplayers, function(key, value) {
 			
 				if(value.pairmania_id!=pairmania_userid){
-					$('#onlinebattleplayers').append('<div class="media" style="padding:5px"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="'+value.Playerimg+'" alt="profile picture" height="60px" ></a></div><div class="media-body"><h4><strong>'+value.player+'</strong></h4><b>&nbsp;<button class="btn btn-xs btn-primary" onclick="invitePlayer(\''+value.PlayerSocketId+'\')">Invite</button></b></div></div>');
+					$('#onlinebattleplayers').append('<div class="media" style="padding:5px"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="'+value.Playerimg+'" alt="profile picture"></a></div><div class="media-body"><h4><strong>'+value.player+'</strong></h4><b>&nbsp;<button class="btn btn-xs btn-primary" onclick="invitePlayer(\''+value.PlayerSocketId+'\')">Invite</button></b></div></div>');
 				}
 			});	
 		})	
 	
 	// listener, whenever the server emits 'updaterooms', this updates the room the client is in
-	socket.on('updateplayers', function(usernames,roomdetails) {
+	socket.on('updatebattleplayers', function(usernames,roomdetails) {
+		console.log(roomdetails);
 		opponantsocketId=0;
-	    currentroomname=roomdetails.roomname;
+	    currentroomname='Battle Play';
 		currentroom=roomdetails.roomid;
 		$('#players').html('');
 		$('#battleplayers').html('');
@@ -69,7 +70,7 @@
 						};
 						
 					battleplayers.push(opponantdetails);
-					$('#players').append('<div class="col-md-6 col-sm-8 col-xs-8"><div  id="'+value.PlayerSocketId+'" data-opponant="'+value.Playerusername+'" data-opponant-socketId="'+value.PlayerSocketId+'"><div class="'+value.PlayerSocketId+' div1"></div></div></div>');
+					$('#players').append('<div class="thumbnail"><div  id="'+value.PlayerSocketId+'" data-opponant="'+value.Playerusername+'" data-opponant-socketId="'+value.PlayerSocketId+'"><div class="'+value.PlayerSocketId+' div1"></div></div></div>');
 					$('#battleplayers').append('<div class="col-md-12" style="margin:10px;"><div class="media"><div class="media-left"><img src="'+value.Playerimg+'" class="media-object thumbnail"></div><div class="media-body"><h4 class="media-heading">' + value.Playerusername + ' </h4><div id="oppbattle"></div></div></div></div>');
 					$( "#"+value.PlayerSocketId ).droppable({
 						  drop: function( event, ui ) {
@@ -93,7 +94,9 @@
 								$('#oppbattle').find('.blurimage').removeClass('blurimage');
 						    }); 
 						
-						$('#mybattle').append('<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1"><a href="javascript:void(0)" class="thumbnail text-center" style="width:80px;height:100px"><img  src="/'+imgval+'.jpg"  img-val="'+imgval+'" width="80" height="100"><span class="badge" style="background-color:#3079AB;margin:1px;">'+imgscore+'</span></a></div>');
+						$('#mybattle').append('<div class="col-md-1 col-sm-1 col-xs-1"><a href="javascript:void(0)" class="thumbnail text-center" style="width:80px;height:100px"><img  src="/'+imgval+'.jpg"  img-val="'+imgval+'"><span class="badge" style="background-color:#3079AB;margin:1px;">'+imgscore+'</span></a></div>');
+						var leftPos = $('#mybattle').scrollLeft();
+						$("#mybattle").animate({scrollLeft: leftPos + 200}, 800);						
 		
 						mybattleimg={
 							PlayerSocketId : socket.id,
@@ -126,7 +129,7 @@
 					};
 					
 					battleplayers.push(mydetails);
-					$('#battleplayers').append('<div class="col-md-12" style="margin:10px;"><div class="media"><div class="media-left"><img src="'+value.Playerimg+'" class="media-object thumbnail" style="width:60px"></div><div class="media-body"><h4 class="media-heading">' + value.Playerusername + ' </h4><div id="mybattle"></div></div></div></div>');
+					$('#battleplayers').append('<div class="col-md-12" style="margin:10px;"><div class="media"><div class="media-left"><img src="'+value.Playerimg+'" class="media-object thumbnail"></div><div class="media-body"><h4 class="media-heading">' + value.Playerusername + ' </h4><div id="mybattle"></div></div></div></div>');
 				}
 				
 				$('#count').text(i);
@@ -205,8 +208,9 @@
 	socket.on('receiveimg', function (username,data) {
 		var dragid = new Date().valueOf();
 		
-		$('#oppbattle').append('<div class="col-xs-1 col-sm-1 col-md-1 col-lg-1"><a href="javascript:void(0)" id="'+data.srcImg+'"class="blurimage thumbnail text-center" style="width:80px;height:100px"><img  src="/'+data.srcImg+'.jpg"  img-val="'+data.srcImg+'" width="80" height="100"><span class="badge" style="background-color:#4CAF50;margin:1px;">'+data.imgscore+'</span></a></div>');
-								
+		$('#oppbattle').append('<div class="col-xs-1 col-sm-1 col-md-1"><a href="javascript:void(0)" id="'+data.srcImg+'"class="blurimage thumbnail text-center" style="width:80px;height:100px"><img  src="/'+data.srcImg+'.jpg"  img-val="'+data.srcImg+'"><span class="badge" style="background-color:#4CAF50;margin:1px;">'+data.imgscore+'</span></a></div>');
+		var leftPos = $('#oppbattle').scrollLeft();
+		$("#oppbattle").animate({scrollLeft: leftPos + 200}, 800);						
 		opponantbattleimg={
 			PlayerSocketId : data.srcsocketId,
 			roomid:data.roomid,
@@ -481,7 +485,7 @@
 		// on connection to server, ask for user's name with an anonymous callback	
 		for(var i=0;i<imgvalue.length;i++){
 			dragid = (new Date().valueOf())*imgvalue[i];
-			$('#currentuser').append('<div id="drag-'+dragid+'" data-val="'+imgvalue[i]+'" data-score="'+imgscore[i]+'" data-pair="'+imgpaircnt[i]+'" class="col-xs-3 col-sm-3 col-md-2 col-lg-2 draggable"><a href="javascript:void(0)" class="thumbnail text-center" style="width:180px;height:250px"><img  src="/'+imgvalue[i]+'.jpg" img-val="'+imgvalue[i]+'" width="180" height="250"><span class="badge">Score: '+imgscore[i]+'</span></a></div>');
+			$('#currentuser').append('<div id="drag-'+dragid+'" data-val="'+imgvalue[i]+'" data-score="'+imgscore[i]+'" data-pair="'+imgpaircnt[i]+'" class="col-xs-3 col-sm-3 col-md-2 col-lg-2 draggable"><a href="javascript:void(0)" class="thumbnail text-center"><img  src="/'+imgvalue[i]+'.jpg" img-val="'+imgvalue[i]+'"><span class="badge">'+imgscore[i]+'</span></a></div>');
 			$('#drag-'+dragid).draggable({
 				  revert: 'invalid',
 				  cursor:'move'
@@ -678,6 +682,13 @@
 		$('#restartbattle').html('<span><a href="javascript:void(0)" class="btn btn-sm btn-primary" onclick="restartbattle(\''+data.PlayerSocketId+'\',\''+data.pairmania_id+'\',\''+data.roomid+'\')">Restart The Battle</a></span>').delay( 2000 ).fadeIn( 400 );
 	});
 	
+	socket.on('imgover',function(data){
+		console.log("Opponant's image got over!!!");
+		$('#targetOutcome').show(500);
+		$('#restartbattle').show(500);
+		$('#targetOutcome').html('<div class="alert alert-danger" style="font-size:16px">Opponants image collection got over. Do you want to restart the battle ? &nbsp;<span id="restartbattle" style="padding-top:5px;"></span>&nbsp;<a href="../" class="btn btn-sm btn-danger" style="padding-top:5px;">Leave the Room</span></div>');
+	});
+	
 	function restartbattle(socketid,pairmaniaid,roomid){
 		
 	    $('#conversation').html('');		
@@ -702,6 +713,19 @@
 		var len1 = (mybattleimgs.length)-1;
 		var len2 = (opponantbattleimgs.length)-1;
 		var len =0;
+		var arraysOfIds = $('#getAllpairs img').map(function(){
+                       return $(this).attr('img-val');
+                   }).get();
+				   
+			console.log('arraysOfIds'+arraysOfIds.length);				   
+						   
+			if(arraysOfIds.length==0){
+				socket.emit('imgoveralert', {
+					srcsocketid:socket.id,
+					trgsocketid:opponantsocketId
+				});
+			}
+		
 		if(len1==len2){
 			$('#oppbattle').find('.blurimage').removeClass('blurimage');
 			len = len1;

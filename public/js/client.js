@@ -9,6 +9,7 @@
 	var imgCollection=['1','2','3'];
 	var playerPlaying=[];
 	var playerScorecard=[];
+	var status='ready';
 	// listener, whenever the server emits 'updatechat', this updates the chat body
 	socket.on('updatechat', function (username, data) {
 		$('#conversation').append('<b>'+username + ':</b> ' + data + '<br>');
@@ -28,8 +29,11 @@
 			});	
 		})	
 	
+	
 	// listener, whenever the server emits 'updaterooms', this updates the room the client is in
 	socket.on('updateplayers', function(usernames,roomdetails) {
+		$('#strtmytune').click();
+		$('#stopmydreams').click();
 	    currentroomname=roomdetails.roomname;
 		currentroom=roomdetails.roomid;
 		$('#players').html('');
@@ -43,7 +47,7 @@
 				playerPlaying.push(value);
 				if(value.PlayerSocketId!=socket.id){
 				    
-					$('#players').append('<div class="swiper-slide"><ul class="list-group" style="z-index:0"><li class="list-group-item"><div class="media"><div class="media-left"><img src="'+value.Playerimg+'" class="media-object" ></div><div class="media-body"><h4 class="media-heading">' + value.player + '</h4></div></div></li><li class="list-group-item" id="'+value.PlayerSocketId+'" data-opponant="'+value.player+'" data-opponant-socketId="'+value.PlayerSocketId+'"><div class="'+value.PlayerSocketId+' div1"></div></li></ul></div>');
+					$('#players').append('<div class="swiper-slide"><ul class="list-group" style="z-index:0"><li class="list-group-item"><div class="media"><div class="media-left"><img src="'+value.Playerimg+'" class="media-object" ></div><div class="media-body"><h4 class="media-heading" style="text-align: left;">' + value.player + '</h4></div></div></li><li class="list-group-item" id="'+value.PlayerSocketId+'" data-opponant="'+value.player+'" data-opponant-socketId="'+value.PlayerSocketId+'"><div class="'+value.PlayerSocketId+' div1"></div></li></ul></div>');
 					
 					$( "#"+value.PlayerSocketId ).droppable({
 						  drop: function( event, ui ) {
@@ -70,7 +74,8 @@
 									getpairs(roomdetails.roomlimit);	
 								  }, 200);
 							}); 
-						  
+						  $('#stopmytune2').click();
+						  $('#strtmytune3').click();
 						  }
 						});
 					  
@@ -81,6 +86,7 @@
 		});
 		
 			if(i>=roomdetails.roomlimit){
+			$('#strtmytune2').click();	
 			console.log(roomdetails.status);
 				if(roomdetails.status=='pending' || roomdetails.status=='ready'){
 					
@@ -106,6 +112,8 @@
 							status:'started',
 							playersocketid:socket.id
 					});
+					status='started';
+					$('#stopmytune2').click();
 					console.log('Game is starting in 10 sec...');
 					$('#targetOutcome').html('<div class="bg-success text-center" style="padding:2px;">Collect <span class="badge" style="font-size:14px">'+roomdetails.roomlimit+' same pairs</span>&nbsp;<button class="btn btn-xs btn-warning" type="button" data-toggle="modal" data-target=".hint-model">Give me hint</div></div>');
 				}
@@ -157,11 +165,11 @@
 					$("#menuToggler").show(500);
 					$("#currentuser").html("");
 					if((roomdetails.roomlimit - i)>1){
-						$('#targetOutcome').html('<div class="alert alert-danger" style="font-size:16px"><span class="badge" style="font-size:18px">'+(roomdetails.roomlimit - i)+'</span> more players needed to start the game</div>');
+						$('#targetOutcome').html('<div class="alert alert-danger" style="font-size:16px"><span class="badge" style="font-size:18px">'+(roomdetails.roomlimit - i)+'</span> more players needed to start the game &nbsp;<button id="leaveRoom" class="btn btn-primary pull-right">Leave The Room</button></div>');
 					}else if((roomdetails.roomlimit - i)==1){
 						$('#targetOutcome').html('<div class="alert alert-warning" style="font-size:16px">Only <span class="badge" style="font-size:18px">'+(roomdetails.roomlimit - i)+'</span> more player needed to start the game</div>');
 					}else if(($("#count").text())<3){
-						$('#targetOutcome').html('<div class="alert alert-danger" style="font-size:16px">It seems that only 2 players are in the Game</div>');
+						$('#targetOutcome').html('<div class="alert alert-danger" style="font-size:16px">It seems that only 2 players are in the Game&nbsp;<button id="leaveRoom" class="btn btn-primary pull-right">Leave The Room</button></div>');
 					}
 				}
 			} );
@@ -211,32 +219,32 @@
 		    for(i=1;i<=playerimgcount;i++){
 				srctag=srctag+"<img src='/"+data.imgval+".jpg' height=40>";
 			}
-			$("."+data.srcsocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"st</span> winner with <span class='badge'>"+data.score+" Coins</span><br>"+srctag+"</div>");
+			$("."+data.srcsocketId).html("<div class='alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"st</span> winner with <span class='badge'>"+data.score+" Coins</span><br>"+srctag+"</div>");
 		}else if(data.rank==2){
 			for(i=1;i<=playerimgcount;i++){
 			   srctag=srctag+"<img src='/"+data.imgval+".jpg' height=40>";
 			}
-			$("."+data.srcsocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"nd</span> winner with <span class='badge'>"+data.score+" Coins</span><br>"+srctag+"</div>");
+			$("."+data.srcsocketId).html("<div class='alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"nd</span> winner with <span class='badge'>"+data.score+" Coins</span><br>"+srctag+"</div>");
 		}else if(data.rank==3){
 			for(i=1;i<=playerimgcount;i++){
 			   srctag=srctag+"<img src='/"+data.imgval+".jpg' height=40>";
 			}
-			$("."+data.srcsocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"rd</span> winner with <span class='badge'>"+data.score+" Coins</span><br>"+srctag+"</div>");
+			$("."+data.srcsocketId).html("<div class='alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"rd</span> winner with <span class='badge'>"+data.score+" Coins</span><br>"+srctag+"</div>");
 		}else{
 			for(i=1;i<=playerimgcount;i++){
 			   srctag=srctag+"<img src='/"+data.imgval+".jpg' height=40>";
 			}
-			$("."+data.srcsocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"th</span> winner with <span class='badge'>"+data.score+" Coins</span><br>"+srctag+"</div>");
+			$("."+data.srcsocketId).html("<div class='alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"th</span> winner with <span class='badge'>"+data.score+" Coins</span><br>"+srctag+"</div>");
 		}
 	}else if(data.status=='ready'){
 		if(data.rank==1){
-		    $("."+data.srcsocketId).html("<div class='alert alert-warning' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;"+data.playername+" is ready with pairs</div>");
+		    $("."+data.srcsocketId).html("<div class='alert-warning' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;"+data.playername+" is ready with pairs</div>");
 		}else if(data.rank==2){
-			$("."+data.srcsocketId).html("<div class='alert alert-warning' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;"+data.playername+" is ready with pairs</div>");
+			$("."+data.srcsocketId).html("<div class='alert-warning' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;"+data.playername+" is ready with pairs</div>");
 		}else if(data.rank==3){
-			$("."+data.srcsocketId).html("<div class='alert alert-warning' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;"+data.playername+" is ready with pairs</div>");
+			$("."+data.srcsocketId).html("<div class='alert-warning' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;"+data.playername+" is ready with pairs</div>");
 		}else{
-			$("."+data.srcsocketId).html("<div class='alert alert-warning' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;"+data.playername+" is ready with pairs</div>");
+			$("."+data.srcsocketId).html("<div class='alert-warning' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;"+data.playername+" is ready with pairs</div>");
 		}
 	}		
 	   //playerPlaying = pendingPlayers;
@@ -617,7 +625,7 @@
 	    //alert(arraysOfIds.length+" - "+data.roomlimit+" - "+targetattr);
 		if(arraysOfIds.length > data.roomlimit){
 				$("."+targetattr).html('<div id="countdown"></div>');
-			    
+			$('#strtmytune2').click();	    
 			countdown = $("."+targetattr).find("#countdown").countdown360({
 				radius: 25,
 				seconds:8,
@@ -628,6 +636,7 @@
 					requestTo(data.srcPlayer,targetattr,data.imgvalue,data.imgscore,data.roomlimit);
 				    $("#"+data.imgvalue).parent('.draggable').remove();
 					console.log('done');
+					$('#stopmytune2').click();	
 				}
 				});
 				countdown.start();
@@ -704,9 +713,11 @@
 		playerPlaying = playerPlaying.filter(function(item){ 
 			return (item.PlayerSocketId == socket.id); 
 		});
+		mydetails[0]['status']=status;
 		$('#gamearea').addClass('hidepannel');	
 		$('#homearea').removeClass('hidepannel');	
 		socket.emit('leaveRoom',mydetails[0]);	
+		console.log('mydetails[0]::'+mydetails[0].status);
 		$("#writeFinalResult").html('');
 		$(".swiper-container").show(500);
 		$("#getAllpairs").show(500);
