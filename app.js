@@ -16,6 +16,7 @@ var con = mysql.createConnection({
     database:"getthepairs"
 });
 */
+
 con.connect(function(err) {
 		  if (err) throw err;
 		  console.log("Connected to db!");
@@ -431,22 +432,23 @@ io.sockets.on('connection', function (socket) {
 			 return (item.PlayerSocketId !== PlayerSocketId); 
 		});
 		
-		player[0]['roomid']=newroom.roomid;					
-		player[0]['roomname']=newroom.roomname;
-		players.push(player[0]);
-		
+		if(player.length){
+			player[0]['roomid']=newroom.roomid;					
+			player[0]['roomname']=newroom.roomname;
+			players.push(player[0]);
+			
+			io.sockets.in(socket.room).emit('connectToRoom', "You are in room no. "+newroom.roomname+" ("+newroom.roomid+")");
+			// echo to room 1 that a person has connected to their room
+			socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', player[0].player + ' has connected to this room');
+			socket.broadcast.to(socket.room).emit('updateplayers', players, newroom);
+			socket.broadcast.to(socket.room).emit('onlineplayers', onlineplayers);
+			socket.emit('onlineplayers', onlineplayers);
+			socket.emit('updateplayers', players, newroom);
+			socket.emit('showgamearea');
+		}
 		// add the client's username to the global list
 		//usernames[username] = newroom.PlayerSocketId;
 		//Send this event to everyone in the room.
-		
-		io.sockets.in(socket.room).emit('connectToRoom', "You are in room no. "+newroom.roomname+" ("+newroom.roomid+")");
-		// echo to room 1 that a person has connected to their room
-		socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', player[0].player + ' has connected to this room');
-		socket.broadcast.to(socket.room).emit('updateplayers', players, newroom);
-		socket.broadcast.to(socket.room).emit('onlineplayers', onlineplayers);
-		socket.emit('onlineplayers', onlineplayers);
-		socket.emit('updateplayers', players, newroom);
-		socket.emit('showgamearea');
 	}
 	
 	socket.on('create', function(room) {
