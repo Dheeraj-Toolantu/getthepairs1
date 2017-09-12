@@ -844,6 +844,9 @@ io.sockets.on('connection', function (socket) {
 	});
 	
 	socket.on('leaveRoom', function(data){
+		if(data.status=='ready'){
+			quickplaycount=quickplaycount-1;
+		}
 		var player={
 				"player" : data.player,
 				"Playerimg" : data.Playerimg,
@@ -866,6 +869,14 @@ io.sockets.on('connection', function (socket) {
 			 return (item.PlayerSocketId !== socket.id); 
 		});
 		
+		battleplayers = battleplayers.filter(function(item){ 
+					 return (item.PlayerSocketId !== socket.id); 
+				});
+		
+		onlinebattleplayers = onlinebattleplayers.filter(function(item){ 
+			 return (item.PlayerSocketId !== socket.id);  
+		});
+		
 		onlineplayers = onlineplayers.filter(function(item){ 
 			 return (item.PlayerSocketId !== socket.id); 
 		});
@@ -873,15 +884,21 @@ io.sockets.on('connection', function (socket) {
 		var room = rooms.filter(function(item){ 
 					return (item.roomid == socket.room); 
 				});		
-		
+		var battleroom = battlerooms.filter(function(item){ 
+					return (item.roomid == socket.room); 
+				});
 		console.log(room);
 		console.log(players[0]);
 		console.log('updated-players--'+ players.length+'('+socket.room+')');
+		console.log('updated-battle-players--'+ battleplayers.length+'('+socket.room+')');
+		
 		// update list of users in chat, client-side
 		socket.broadcast.to(socket.room).emit('updatechat', 'SERVER ', socket.username+' has left the game');
 		socket.broadcast.to(socket.room).emit('updateplayers', players ,room[0]);
-		socket.emit('updateplayers', players ,room[0]);
 		socket.broadcast.emit('onlineplayers', onlineplayers);
+		socket.broadcast.emit('onlinebattleplayers', onlinebattleplayers);
+		socket.broadcast.to(socket.room).emit('updatebattleplayers', battleplayers,battleroom[0]);
+		
 		socket.broadcast.emit('showplayercount', onlineplayers);
 		
 		// echo globally that this client has left
@@ -1021,15 +1038,16 @@ io.sockets.on('connection', function (socket) {
 				// echo to room 1 that a person has connected to their room
 				socket.broadcast.to(socket.room).emit('updatechat', 'SERVER', battleplayer.Playerusername + ' has connected to this room');
 				socket.emit('onlinebattleplayers', onlinebattleplayers);
-				socket.broadcast.to(socket.room).emit('updateplayers', battleplayers, newroom);
+				socket.broadcast.to(socket.room).emit('updatebattleplayers', battleplayers, newroom);
 				socket.emit('onlineplayers', onlineplayers);
-				socket.emit('updateplayers', battleplayers, newroom);
+				socket.emit('updatebattleplayers', battleplayers, newroom);
 				socket.emit('showgamearea');
 			
 		    });
 	}
 	
 	socket.on('battleStarted', function (data) { 
+		socket.room=data.roomid;
 		socket.broadcast.to(data.PlayerSocketId).emit('sendbattleImg',data);
 	
 		for(var i=0;i<battlerooms.length;i++){
@@ -1098,6 +1116,11 @@ io.sockets.on('connection', function (socket) {
 		}
 	});
 	
+	socket.on('imgoveralert', function (data) { 
+	    console.log('imgoveralert---'+data.trgsocketid);
+		socket.broadcast.to(data.trgsocketid).emit('imgover');
+	});
+	
 	socket.on('rejoinbattle', function (data) { 
 		
 		console.log('rejoining battle...'+data.PlayerSocketId+'....'+data.roomid);
@@ -1117,28 +1140,28 @@ io.sockets.on('connection', function (socket) {
 			    imgpaircnt=row1[0].usercollec_img_count;
 			
 			battleplayer = {
-				Playerusername : data.Playerusername, 
-				Playerimg : data.Playerimg, 
- 				pairmania_id : data.pairmania_id,
-				PlayerSocketId : data.PlayerSocketId,
+				Playerusername : player[0].Playerusername, 
+				Playerimg : player[0].Playerimg, 
+ 				pairmania_id : player[0].pairmania_id,
+				PlayerSocketId : player[0].PlayerSocketId,
 				imgvalue : imgvalue,
 				imgscore : imgscore,
 				imgpaircnt:imgpaircnt,
-				roomid : newroom.roomid,
-				roomname : newroom.roomname	
+				roomid : data.roomid,
+				roomname : 'Battle Play'	
 			}
 			
 			var newroom={
-				roomid: player[0].roomid,
-				roomname:player[0].roomname,
+				roomid: data.roomid,
+				roomname:'Battle Play',
 				status : 'ready',
 				roomlimit:2
 			}
 			
 			battleplayers.push(battleplayer);
 		    console.log('reconnected to'+newroom);
-			socket.broadcast.to(data.roomid).emit('updateplayers', battleplayers, newroom);
-			socket.emit('updateplayers', battleplayers, newroom);
+			socket.broadcast.to(data.roomid).emit('updatebattleplayers', battleplayers, newroom);
+			socket.emit('updatebattleplayers', battleplayers, newroom);
 		});
 	});
 });
