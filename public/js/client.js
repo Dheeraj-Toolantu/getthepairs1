@@ -32,8 +32,8 @@
 	
 	// listener, whenever the server emits 'updaterooms', this updates the room the client is in
 	socket.on('updateplayers', function(usernames,roomdetails) {
-		$('#strtmytune').click();
-		$('#stopmydreams').click();
+		//$('#strtmytune').click();
+		//$('#stopmydreams').click();
 	    currentroomname=roomdetails.roomname;
 		currentroom=roomdetails.roomid;
 		$('#players').html('');
