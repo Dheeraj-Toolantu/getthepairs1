@@ -37,6 +37,9 @@
 		var playerimg = '';
 		var pairmania_userid = 0;
 		var prevtimeinterval=0;
+		$('#happykids').hide();
+		$('#clock').hide();
+		$('#switch').hide();
 	</script>
 
 	<style>
@@ -753,37 +756,13 @@ function closescoreNav() {
 			</div>
 		</div>
 	</div>
-	<button id="strtmydreams" onclick="document.getElementById('dream').play()" style="display:none;">Play Music</button>
-	<button id="stopmydreams" onclick="document.getElementById('dream').pause()" style="display:none;">Play Music</button>
-	<audio id="dream" controls loop>
-		<source src="/Puzzle-Dreams-3.mp3">
-	</audio>
-	<button id="strtmytune" onclick="document.getElementById('myTune').play()" style="display:none;">Play Music</button>
-	<audio id="myTune" controls loop>
-		<source src="/Retro-Frantic_V001_Looping.mp3">
-	</audio>
-	<button id="strtmytune1" onclick="document.getElementById('happykids').play()" style="display:none;">Play Music</button>
-	<audio id="happykids">
-		<source src="/happykids.mp3">
-	</audio>
-	<button id="strtmytune2" onclick="document.getElementById('clock').play()" style="display:none;">Play Music</button>
-	<button id="stopmytune2" onclick="document.getElementById('clock').pause()" style="display:none;">Play Music</button>
-	<audio id="clock">
-		<source src="/clock.mp3">
-	</audio>
-	<button id="strtmytune3" onclick="document.getElementById('switch').play()" style="display:none;">Play Music</button>
-	<audio id="switch">
-		<source src="/switch.mp3">
-	</audio>
 	<script>
 	$(document).ready(function(){
-	    $('#myTune').hide();
-		$('#happykids').hide();
+	    $('#happykids').hide();
 		$('#clock').hide();
 		$('#switch').hide();
-		$('#dream').hide();
-	    socket.on('connect', function(){
-		    $('#strtmydreams').click();
+		socket.on('connect', function(){
+		
 			playername=$('.singleuser').html();
 			playerimg = $('#profile').attr('src');
 			pairmania_userid = $('#pairmania_userid').attr('value');
@@ -876,5 +855,19 @@ function closescoreNav() {
 <script src="/js/client.js"></script>
 <% } %>
 
+	<button id="strtmytune1" onclick="document.getElementById('happykids').play()" style="display:none;">Play Music</button>
+	<audio id="happykids">
+		<source src="/happykids.mp3">
+	</audio>
+	<button id="strtmytune2" onclick="document.getElementById('clock').play()" style="display:none;">Play Music</button>
+	<button id="stopmytune2" onclick="document.getElementById('clock').pause()" style="display:none;">Play Music</button>
+	<audio id="clock">
+		<source src="/clock.mp3">
+	</audio>
+	<button id="strtmytune3" onclick="document.getElementById('switch').play()" style="display:none;">Play Music</button>
+	<audio id="switch">
+		<source src="/switch.mp3">
+	</audio>
+	
 </body>
 </html>
