@@ -16,6 +16,7 @@
 	var opponantbattleimg={};
 	var mybattleimg={};
 	var opponantsocketId=0;
+	var opponantdetails={};
 	// listener, whenever the server emits 'updatechat', this updates the chat body
 	socket.on('updatechat', function (username, data) {
 		$('#conversation').append('<b>'+username + ':</b> ' + data + '<br>');
@@ -30,7 +31,9 @@
 		$.each(onlinebattleplayers, function(key, value) {
 			
 				if(value.pairmania_id!=pairmania_userid){
-					$('#onlinebattleplayers').append('<div class="media" style="padding:5px"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="'+value.Playerimg+'" alt="profile picture"></a></div><div class="media-body"><h4><strong>'+value.player+'</strong></h4><b>&nbsp;<button class="btn btn-xs btn-primary" onclick="invitePlayer(\''+value.PlayerSocketId+'\')">Invite</button></b></div></div>');
+					if(value.Playerimg!=null && value.player!=null && value.PlayerSocketId!=null){
+						$('#onlinebattleplayers').append('<div class="media" style="padding:5px"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="'+value.Playerimg+'" alt="profile picture"></a></div><div class="media-body"><h4><strong>'+value.player+'</strong></h4><b>&nbsp;<button class="btn btn-xs btn-primary" onclick="invitePlayer(\''+value.PlayerSocketId+'\')">Invite</button></b></div></div>');
+					}
 				}
 			});	
 		})	
@@ -49,7 +52,7 @@
 		rank=1;
 		console.log(roomdetails+'....'+ currentroom);
 		$.each(usernames, function(key, value) {
-			var opponantdetails={};
+			
 			if(value.roomid==currentroom){
 				playerPlaying.push(value);
 				if(value.PlayerSocketId!=socket.id){
@@ -68,10 +71,10 @@
 							roomlimit:roomdetails.roomlimit,
 							roompassword:roomdetails.roompassword
 						};
-						
+
 					battleplayers.push(opponantdetails);
-					$('#players').append('<div class="thumbnail"><div  id="'+value.PlayerSocketId+'" data-opponant="'+value.Playerusername+'" data-opponant-socketId="'+value.PlayerSocketId+'"><div class="'+value.PlayerSocketId+' div1"></div></div></div>');
-					$('#battleplayers').append('<div class="col-md-12" style="margin:10px;"><div class="media"><div class="media-left"><img src="'+value.Playerimg+'" class="media-object thumbnail"></div><div class="media-body"><h4 class="media-heading">' + value.Playerusername + ' </h4><div id="oppbattle"></div></div></div></div>');
+					$('#players').append('<div class="thumbnail"><div  id="'+value.PlayerSocketId+'" data-opponant="'+value.Playerusername+'" data-opponant-socketId="'+value.PlayerSocketId+'"><div class="'+value.PlayerSocketId+'" style="height:100%;"></div></div></div>');
+					$('#battleplayers').append('<div class="col-md-6 col-lg-6 col-sm-12 col-xs-12"><div class="media"><div class="media-left"><img src="'+value.Playerimg+'" class="media-object thumbnail"></div><div class="media-body"><h4 class="media-heading">' + value.Playerusername + ' </h4><div id="oppbattle"></div></div></div></div>');
 					$( "#"+value.PlayerSocketId ).droppable({
 						  drop: function( event, ui ) {
 						   var target = $(event.target);
@@ -95,8 +98,9 @@
 						    }); 
 							
 							ion.sound.play("switch");
+							ion.sound.pause("clock");
 							
-						$('#mybattle').append('<div class="col-md-1 col-sm-1 col-xs-1"><a href="javascript:void(0)" class="thumbnail text-center" style="width:80px;height:100px"><img  src="/'+imgval+'.jpg"  img-val="'+imgval+'"><span class="badge" style="background-color:#3079AB;margin:1px;">'+imgscore+'</span></a></div>');
+						$('#mybattle').append('<div class="col-md-1 col-sm-1 col-xs-1"><a href="javascript:void(0)" class="thumbnail text-center"><img  src="/'+imgval+'.jpg"  img-val="'+imgval+'"><span class="badge" style="background-color:#3079AB;margin:1px;">'+imgscore+'</span></a></div>');
 						var leftPos = $('#mybattle').scrollLeft();
 						$("#mybattle").animate({scrollLeft: leftPos + 200}, 800);						
 		
@@ -131,7 +135,7 @@
 					};
 					
 					battleplayers.push(mydetails);
-					$('#battleplayers').append('<div class="col-md-12" style="margin:10px;"><div class="media"><div class="media-left"><img src="'+value.Playerimg+'" class="media-object thumbnail"></div><div class="media-body"><h4 class="media-heading">' + value.Playerusername + ' </h4><div id="mybattle"></div></div></div></div>');
+					$('#battleplayers').append('<div class="col-md-6 col-lg-6 col-sm-12 col-xs-12"><div class="media"><div class="media-left"><img src="'+value.Playerimg+'" class="media-object thumbnail"></div><div class="media-body"><h4 class="media-heading">' + value.Playerusername + ' </h4><div id="mybattle"></div></div></div></div>');
 				}
 				
 				$('#count').text(i);
@@ -168,7 +172,7 @@
 						});
 						ion.sound.pause("clock");	
 						console.log('Battle is started...');
-						$('#targetOutcome').html('<div class="alert alert-success" style="font-size:16px">Battle has been started. Please drag your collected image and put into BATTLE AREA.</div>').delay( 10000 ).hide( 500 );;
+						$('#targetOutcome').html('<div class="alert alert-success text-center" style="font-size:16px">Drag your image and put into BATTLE AREA.</div>').delay( 10000 ).hide( 500 );;
 					    $('.'+opponantsocketId).html('<div class="text-center" style="font-size:20px;width:100%;height:100%;padding-top:20px;color:#3c763d">BATTLE AREA</div>');
 					} 
 				});
@@ -210,7 +214,7 @@
 	socket.on('receiveimg', function (username,data) {
 		var dragid = new Date().valueOf();
 		
-		$('#oppbattle').append('<div class="col-xs-1 col-sm-1 col-md-1"><a href="javascript:void(0)" id="'+data.srcImg+'"class="blurimage thumbnail text-center" style="width:80px;height:100px"><img  src="/'+data.srcImg+'.jpg"  img-val="'+data.srcImg+'"><span class="badge" style="background-color:#4CAF50;margin:1px;">'+data.imgscore+'</span></a></div>');
+		$('#oppbattle').append('<div class="col-xs-1 col-sm-1 col-md-1"><a href="javascript:void(0)" id="'+data.srcImg+'"class="blurimage thumbnail text-center"><img  src="/'+data.srcImg+'.jpg"  img-val="'+data.srcImg+'"><span class="badge" style="background-color:#4CAF50;margin:1px;">'+data.imgscore+'</span></a></div>');
 		var leftPos = $('#oppbattle').scrollLeft();
 		$("#oppbattle").animate({scrollLeft: leftPos + 200}, 800);						
 		opponantbattleimg={
@@ -321,23 +325,13 @@
 		for(var l=0;l < data.length;l++){
 			$("#displayResult").append('<div class="media"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="/'+data[l].usercollec_imgval+'.jpg" alt="profile picture" height="80px" ></a></div><div class="media-body"><h4 class="media-heading"><strong>'+data[l].usercollec_username+'</strong></h4><b>&nbsp;<span class="badge">Pairs : '+data[l].usercollec_img_count+'</span>&nbsp;<span class="badge">Score : '+data[l].userscore+'</span></b></div></div>'); 
 		}
-		
-		// playerusername, usercollec_imgval, usercollec_img_count
-		/*
-		$.each(playerScorecard, function(key, value) {
-		    if(value.room==currentroom){
-				
-				$("#displayResult").append('<div class="media"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="/profile.png" alt="profile picture" height="80px" ></a></div><div class="media-body"><h4 class="media-heading"><strong>'+value.playername+'</strong></h4><b>&nbsp;<span class="badge">Rank : '+value.rank+'</span>&nbsp;<span class="badge">Coins : '+value.score+'</span></b></div></div>');
-				
-				$("#menuToggler").show(500);
-			}
-		});
-		*/
-		
 	});
 	
 	socket.on('writeFinalResult', function (data) {
 	    $("#writeFinalResult").html('');
+		$("#battleplayers").html('');
+		$("#players").html('');
+		$('#targetOutcome').html('<div class="alert alert-danger text-center">Game Over!!!&nbsp;<a href="../" class="btn btn-sm btn-primary">Leave The Room</a></div>');
 	    $(".swiper-container").hide(500);
 		$("#getAllpairs").hide(500);
 		$("#menuToggler").hide(500);
@@ -345,38 +339,36 @@
 		
 		var str3='';
 		var str4='';
-		for(var l=0;l < data.length;l++){
-		    str3='';
-			str4='';
-			var str1 = data[l].usercollec_imgval;
-			var imgval = new Array();
-			imgval = str1.split(",");
+		if(data.length){
+			for(var l=0;l < data.length;l++){
+				str3='';
+				str4='';
+				var str1 = data[l].usercollec_imgval;
+				var imgval = new Array();
+				imgval = str1.split(",");
+				
+				var str2 = data[l].usercollec_img_count;
+				var imgcnt = new Array();
+				imgcnt = str2.split(",");
+				
+				var str5= data[l].userscore;
+				var imgscore = new Array();
+				imgscore = str5.split(",");
+				
+				str3 = '<div class="col-md-4"><div class="panel panel-default"><div class="panel-heading"><h4><img src="'+data[l].userimg+'" width="50px">&nbsp;'+data[l].usercollec_username+'  <span style="font-size:14px;">has won following paired images from the apponant</span>&nbsp;<span class="badge">Total Coins: '+data[l].usertotalscore+'</span></h4></div><div class="panel-body"><ul class="list-group">';
+				
+				for(var m=0;m<imgval.length;m++){
+					str4 = str4 + '<li class="list-group-item"><div class="media"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="/'+imgval[m]+'.jpg" alt="profile picture" height="40px" ></a></div><div class="media-body"><b>&nbsp;<span class="badge">Pairs : '+imgcnt[m]+'</span>&nbsp;<span class="badge">Coins : '+imgscore[m]+'</span></b></div></div></li>';
+				}
+				str3 = str3+str4+'<ul></div></div></div>';
+				
+				$("#writeFinalResult").append(str3);
+			}	
 			
-			var str2 = data[l].usercollec_img_count;
-			var imgcnt = new Array();
-			imgcnt = str2.split(",");
-			
-			var str5= data[l].userscore;
-			var imgscore = new Array();
-			imgscore = str5.split(",");
-			
-			str3 = '<div class="col-md-4"><div class="panel panel-default"><div class="panel-heading"><h4><img src="'+playerimg+'" width="50px">&nbsp;'+data[l].usercollec_username+'&nbsp;<span class="badge">Total Coins: '+data[l].usertotalscore+'</span></h4></div><div class="panel-body"><ul class="list-group">';
-			
-			for(var m=0;m<imgval.length;m++){
-				str4 = str4 + '<li class="list-group-item"><div class="media"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="/'+imgval[m]+'.jpg" alt="profile picture" height="40px" ></a></div><div class="media-body"><b>&nbsp;<span class="badge">Pairs : '+imgcnt[m]+'</span>&nbsp;<span class="badge">Coins : '+imgscore[m]+'</span></b></div></div></li>';
-			}
-			str3 = str3+str4+'<ul></div></div></div>';
-			
-			$("#writeFinalResult").append(str3);
+		}else{
+			$("#writeFinalResult").append('<div class="alert alert-danger">No one won the battle !!!</div>');
 		}
-		/*$.each(playerScorecard, function(key, value) {
-		    if(value.room==currentroom){
-				
-				$("#writeFinalResult").append('<div class="media"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="/profile.png" alt="profile picture" height="80px" ></a></div><div class="media-body"><h4 class="media-heading"><strong>'+value.playername+'</strong></h4><b>&nbsp;<span class="badge">Rank : '+value.rank+'</span>&nbsp;<span class="badge">Coins : '+value.score+'</span></b></div></div>');
-				
-				$("#menuToggler").show(500);
-			}
-		});*/
+		
 	});
 	
 	socket.on('updaterooms', function (rooms) {
@@ -487,7 +479,7 @@
 		// on connection to server, ask for user's name with an anonymous callback	
 		for(var i=0;i<imgvalue.length;i++){
 			dragid = (new Date().valueOf())*imgvalue[i];
-			$('#currentuser').append('<div id="drag-'+dragid+'" data-val="'+imgvalue[i]+'" data-score="'+imgscore[i]+'" data-pair="'+imgpaircnt[i]+'" class="col-xs-3 col-sm-3 col-md-2 col-lg-2 draggable"><a href="javascript:void(0)" class="thumbnail text-center"><img  src="/'+imgvalue[i]+'.jpg" img-val="'+imgvalue[i]+'"><span class="badge">'+imgscore[i]+'</span></a></div>');
+			$('#currentuser').append('<div id="drag-'+dragid+'" data-val="'+imgvalue[i]+'" data-score="'+imgscore[i]+'" data-pair="'+imgpaircnt[i]+'" class="col-xs-2 col-sm-3 col-md-2 col-lg-2 draggable"><a href="javascript:void(0)" class="thumbnail text-center"><img  src="/'+imgvalue[i]+'.jpg" img-val="'+imgvalue[i]+'"><span class="badge">'+imgscore[i]+'</span></a></div>');
 			$('#drag-'+dragid).draggable({
 				  revert: 'invalid',
 				  cursor:'move'
@@ -577,7 +569,7 @@
                    }).get();
 	    
 		if(arraysOfIds.length > data.roomlimit){
-			
+			ion.sound.play("clock");
 			$("."+targetattr).html('<div id="countdown"></div>');
 			    
 			countdown = $("."+targetattr).find("#countdown").countdown360({
@@ -590,6 +582,7 @@
 					//requestTo(data.srcPlayer,targetattr,data.imgvalue,data.imgscore,data.roomlimit);
 				    $("#"+data.imgvalue).parent('.draggable').remove();
 					console.log('done');
+					ion.sound.pause("clock");
 				}
 				});
 				countdown.start();
@@ -663,13 +656,13 @@
 		
 		console.log('winner is '+winnerdata.Playerusername)
 		if(winnerdata.PlayerSocketId!=socket.id){
-			$('#targetOutcome').html('<div class="alert alert-danger" style="font-size:16px">You have lost the battle.&nbsp;<span id="restartbattle" style="padding-top:5px;"></span></div>');
+			$('#targetOutcome').html('<div class="alert alert-danger text-center" style="font-size:16px">You have lost the battle.&nbsp;<span id="restartbattle" style="padding-top:5px;"></span></div>');
 			ion.sound.play("lost");
 		}else if(winnerdata.PlayerSocketId==socket.id){
-			$('#targetOutcome').html('<div class="alert alert-success" style="font-size:16px">You have won the battle.&nbsp;<span id="restartbattle" style="padding-top:5px;"></span></div>');
+			$('#targetOutcome').html('<div class="alert alert-success text-center" style="font-size:16px">You have won the battle.&nbsp;<span id="restartbattle" style="padding-top:5px;"></span></div>');
 			ion.sound.play("happykids");
 		}else if(loserdata.PlayerSocketId==socket.id){
-			$('#targetOutcome').html('<div class="alert alert-success" style="font-size:16px">You have lost the battle.&nbsp;<span id="restartbattle" style="padding-top:5px;"></span></div>');
+			$('#targetOutcome').html('<div class="alert alert-success text-center" style="font-size:16px">You have lost the battle.&nbsp;<span id="restartbattle" style="padding-top:5px;"></span></div>');
 		}
 		console.log('loser is '+loserdata.Playerusername)
 		setTimeout(
@@ -683,14 +676,14 @@
 	
 	socket.on('recreatebattleroom',function(data){
 		console.log('recreatebattleroom----'+data.roomid);
-		$('#restartbattle').html('<span><a href="javascript:void(0)" class="btn btn-sm btn-primary" onclick="restartbattle(\''+data.PlayerSocketId+'\',\''+data.pairmania_id+'\',\''+data.roomid+'\')">Restart The Battle</a></span>').delay( 2000 ).fadeIn( 400 );
+		$('#targetOutcome').append('<div class="alert alert-warning text-center" style="font-size:16px"><span><a href="javascript:void(0)" class="btn btn-sm btn-primary" onclick="restartbattle(\''+data.PlayerSocketId+'\',\''+data.pairmania_id+'\',\''+data.roomid+'\')">Restart The Battle</a></span></div>').fadeIn( 400 );
 	});
 	
 	socket.on('imgover',function(data){
 		console.log("Opponant's image got over!!!");
 		$('#targetOutcome').show(500);
-		$('#restartbattle').show(500);
-		$('#targetOutcome').html('<div class="alert alert-danger" style="font-size:16px">Opponants image collection got over. Do you want to restart the battle ? &nbsp;<span id="restartbattle" style="padding-top:5px;"></span>&nbsp;<a href="../" class="btn btn-sm btn-danger" style="padding-top:5px;">Leave the Room</span></div>');
+		$('#targetOutcome').html('');
+		$('#targetOutcome').append('<div class="alert alert-danger" style="font-size:16px">Opponants image collection got over.&nbsp;<span id="restartbattle" style="padding-top:5px;"></span>&nbsp;<a href="../" class="btn btn-sm btn-danger" style="padding-top:5px;">Leave the Room</span></div>');
 	});
 	
 	function restartbattle(socketid,pairmaniaid,roomid){
@@ -724,9 +717,10 @@
 			console.log('arraysOfIds'+arraysOfIds.length);				   
 						   
 			if(arraysOfIds.length==0){
+				$('#targetOutcome').html('');
 				socket.emit('imgoveralert', {
-					srcsocketid:socket.id,
-					trgsocketid:opponantsocketId
+					opponantdetails:opponantdetails,
+					mydetails:mydetails
 				});
 			}
 		

@@ -12,6 +12,11 @@
 	var status='ready';
 	
 	// listener, whenever the server emits 'updatechat', this updates the chat body
+	socket.on('addquickplay', function () {
+		$('#quickplay').show();
+		$('#createRoom').show();
+	});
+	
 	socket.on('updatechat', function (username, data) {
 		$('#conversation').append('<b>'+username + ':</b> ' + data + '<br>');
 	});
@@ -25,11 +30,12 @@
 		var i=0;
 		$.each(onlineplayers, function(key, value) {
 				if(value.PlayerSocketId!=socket.id){
-					$('#onlineplayers').append('<div class="media" style="padding:5px"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="'+value.Playerimg+'" alt="profile picture" height="60px" ></a></div><div class="media-body"><h4><strong>'+value.player+'</strong></h4><b>&nbsp;<button class="btn btn-xs btn-primary" onclick="invitePlayer(\''+value.PlayerSocketId+'\')">Invite</button></b></div></div>');
+					if(value.Playerimg!=null && value.player!=null && value.PlayerSocketId!=null){
+						$('#onlineplayers').append('<div class="media" style="padding:5px"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="'+value.Playerimg+'" alt="profile picture" height="60px" ></a></div><div class="media-body"><h4><strong>'+value.player+'</strong></h4><b>&nbsp;<button class="btn btn-xs btn-primary invitePlayer" onclick="invitePlayer(\''+value.PlayerSocketId+'\')">Invite</button></b></div></div>');
+					}
 				}
 			});	
 		})	
-	
 	
 	// listener, whenever the server emits 'updaterooms', this updates the room the client is in
 	socket.on('updateplayers', function(usernames,roomdetails) {
@@ -145,11 +151,11 @@
 					$("#menuToggler").show(500);
 					$("#currentuser").html("");
 					if((roomdetails.roomlimit - i)>1){
-						$('#targetOutcome').html('<div class="alert alert-danger" style="font-size:16px"><span class="badge" style="font-size:18px">'+(roomdetails.roomlimit - i)+'</span> more players needed to start the game &nbsp;<button id="leaveRoom" class="btn btn-primary pull-right">Leave The Room</button></div>');
+						$('#targetOutcome').html('<div class="alert alert-danger text-center" style="font-size:16px"><span class="badge" style="font-size:18px">'+(roomdetails.roomlimit - i)+'</span> more players needed to start the game &nbsp;<button id="leaveRoom" class="btn btn-sm btn-primary">Leave The Room</button></div>');
 					}else if((roomdetails.roomlimit - i)==1){
-						$('#targetOutcome').html('<div class="alert alert-warning" style="font-size:16px">Only <span class="badge" style="font-size:18px">'+(roomdetails.roomlimit - i)+'</span> more player needed to start the game</div>');
+						$('#targetOutcome').html('<div class="alert alert-warning text-center" style="font-size:16px">Only <span class="badge" style="font-size:18px">'+(roomdetails.roomlimit - i)+'</span> more player needed to start the game&nbsp;<button id="leaveRoom" class="btn btn-sm btn-primary">Leave The Room</button></div>');
 					}else if(($("#count").text())<3){
-						$('#targetOutcome').html('<div class="alert alert-danger" style="font-size:16px">It seems that only 2 players are in the Game&nbsp;<button id="leaveRoom" class="btn btn-primary pull-right">Leave The Room</button></div>');
+						$('#targetOutcome').html('<div class="alert alert-danger text-center" style="font-size:16px">It seems that only 2 players are in the Game&nbsp;<button id="leaveRoom" class="btn btn-sm btn-primary">Leave The Room</button></div>');
 					}
 				}
 			} );
@@ -199,22 +205,22 @@
 		    for(i=1;i<=playerimgcount;i++){
 				srctag=srctag+"<img src='/"+data.imgval+".jpg' height=40>";
 			}
-			$("."+data.srcsocketId).html("<div class='alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"st</span> winner with <span class='badge'>"+data.score+" Coins</span><br>"+srctag+"</div>");
+			$("."+data.srcsocketId).html("<div class='alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"st</span> winner with <span class='badge'>"+data.score+" Coins</span><br><br>"+srctag+"</div>");
 		}else if(data.rank==2){
 			for(i=1;i<=playerimgcount;i++){
 			   srctag=srctag+"<img src='/"+data.imgval+".jpg' height=40>";
 			}
-			$("."+data.srcsocketId).html("<div class='alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"nd</span> winner with <span class='badge'>"+data.score+" Coins</span><br>"+srctag+"</div>");
+			$("."+data.srcsocketId).html("<div class='alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"nd</span> winner with <span class='badge'>"+data.score+" Coins</span><br><br>"+srctag+"</div>");
 		}else if(data.rank==3){
 			for(i=1;i<=playerimgcount;i++){
 			   srctag=srctag+"<img src='/"+data.imgval+".jpg' height=40>";
 			}
-			$("."+data.srcsocketId).html("<div class='alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"rd</span> winner with <span class='badge'>"+data.score+" Coins</span><br>"+srctag+"</div>");
+			$("."+data.srcsocketId).html("<div class='alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"rd</span> winner with <span class='badge'>"+data.score+" Coins</span><br><br>"+srctag+"</div>");
 		}else{
 			for(i=1;i<=playerimgcount;i++){
 			   srctag=srctag+"<img src='/"+data.imgval+".jpg' height=40>";
 			}
-			$("."+data.srcsocketId).html("<div class='alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"th</span> winner with <span class='badge'>"+data.score+" Coins</span><br>"+srctag+"</div>");
+			$("."+data.srcsocketId).html("<div class='alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;<span class='badge'>"+data.rank+"th</span> winner with <span class='badge'>"+data.score+" Coins</span><br><br>"+srctag+"</div>");
 		}
 	}else if(data.status=='ready'){
 		if(data.rank==1){
@@ -364,7 +370,7 @@
 		}else{ 
 		 roompass='na';
 		}
-		 $('#restartGame').html('<span><a href="javascript:void(0)" class="btn btn-sm btn-primary" onclick="restartGame(\''+room.roomid+'\',\''+room.roomname+'\',\''+room.roomlimit+'\',\''+roompass+'\',\''+imgvalue+'\',\''+imgscore+'\',\''+room.status+'\')">Restart The Game</a></span>').delay( 2000 ).fadeIn( 400 );
+		 $('#restartGame').html('<div class="alert alert-warning"><a href="javascript:void(0)" class="btn btn-sm btn-primary" onclick="restartGame(\''+room.roomid+'\',\''+room.roomname+'\',\''+room.roomlimit+'\',\''+roompass+'\',\''+imgvalue+'\',\''+imgscore+'\',\''+room.status+'\')">Restart The Game</a></div>').delay( 2000 ).fadeIn( 400 );
 	
 	});
 	
@@ -658,6 +664,7 @@
 	});
 	
 	socket.on('showmypairs',function (data){
+		$("#showmypairs").html('');
 		for(var i=0;i<data.length;i++){
 			$("#showmypairs").append('<div class="col-xs-6 col-sm-3 col-md-3"><div class="thumbnail"><img src="/'+data[i].usercollec_imgval+'.jpg" alt="pairs"><div class="caption"><h4>&nbsp;<span class="badge">PAIRS : '+data[i].usercollec_img_count+'</span></h4><h4>&nbsp;<span class="badge">COINS : '+data[i].usercollec_user_score+'</span></h4></div></div></div>');
 		}
@@ -686,6 +693,10 @@
 		$('#restartGame').hide(200);	
 	});
 	
+	$(document).on("click",".invitePlayer",function(e){	
+		$(this).hide(100);	
+	});
+	
 	$(document).on("click","#leaveRoom",function(e){
 		var mydetails = playerPlaying.filter(function(item){ 
 			return (item.PlayerSocketId == socket.id); 
@@ -706,5 +717,7 @@
 		$("#CountDownTimer").TimeCircles().destroy();
 		$("#CountDownTimer").html('');
 		$("#conversation").html('');
+		$("#displayResult").html('');
 		ion.sound.play("Puzzle-Dreams-3");
+		ion.sound.pause("Retro-Frantic_V001_Looping");
 	});	
