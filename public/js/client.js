@@ -34,6 +34,7 @@
 	// listener, whenever the server emits 'updaterooms', this updates the room the client is in
 	socket.on('updateplayers', function(usernames,roomdetails) {
 		ion.sound.play("Retro-Frantic_V001_Looping");
+		ion.sound.pause("Puzzle-Dreams-3");
 		currentroomname=roomdetails.roomname;
 		currentroom=roomdetails.roomid;
 		$('#players').html('');
@@ -705,4 +706,5 @@
 		$("#CountDownTimer").TimeCircles().destroy();
 		$("#CountDownTimer").html('');
 		$("#conversation").html('');
+		ion.sound.play("Puzzle-Dreams-3");
 	});	
