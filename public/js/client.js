@@ -10,6 +10,10 @@
 	var playerPlaying=[];
 	var playerScorecard=[];
 	var status='ready';
+	var bgmusic=0;
+	var clock = 0;
+	var putsound = 0;
+				
 	// listener, whenever the server emits 'updatechat', this updates the chat body
 	socket.on('updatechat', function (username, data) {
 		$('#conversation').append('<b>'+username + ':</b> ' + data + '<br>');
@@ -32,9 +36,9 @@
 	
 	// listener, whenever the server emits 'updaterooms', this updates the room the client is in
 	socket.on('updateplayers', function(usernames,roomdetails) {
-		//$('#strtmytune').click();
-		//$('#stopmydreams').click();
-	    currentroomname=roomdetails.roomname;
+		bgmusic = document.getElementById("myTune");
+		bgmusic.play();
+		currentroomname=roomdetails.roomname;
 		currentroom=roomdetails.roomid;
 		$('#players').html('');
 		$('#restartGame').html('');
@@ -74,8 +78,9 @@
 									getpairs(roomdetails.roomlimit);	
 								  }, 200);
 							}); 
-						  $('#stopmytune2').click();
-						  $('#strtmytune3').click();
+						  putsound = document.getElementById("switch");	
+						  putsound.play();
+						  clock.pause();
 						  }
 						});
 					  
@@ -86,7 +91,8 @@
 		});
 		
 			if(i>=roomdetails.roomlimit){
-			$('#strtmytune2').click();	
+			clock = document.getElementById("clock")	
+			clock.play();	
 			console.log(roomdetails.status);
 				if(roomdetails.status=='pending' || roomdetails.status=='ready'){
 					
@@ -113,8 +119,8 @@
 							playersocketid:socket.id
 					});
 					status='started';
-					$('#stopmytune2').click();
-					console.log('Game is starting in 10 sec...');
+					clock.pause();
+					console.log('Game is started...');
 					$('#targetOutcome').html('<div class="bg-success text-center" style="padding:2px;">Collect <span class="badge" style="font-size:14px">'+roomdetails.roomlimit+' same pairs</span>&nbsp;<button class="btn btn-xs btn-warning" type="button" data-toggle="modal" data-target=".hint-model">Give me hint</div></div>');
 				}
 				});
@@ -140,26 +146,6 @@
 										});
 									  }, 500);
 									  
-								/*var countdown =  1  * 60 * 1000;
-								var timerId = setInterval(function(){
-								  countdown -= 1000;
-								  var min = Math.floor(countdown / (60 * 1000));
-								  //var sec = Math.floor(countdown - (min * 60 * 1000));  // wrong
-								  var sec = Math.floor((countdown - (min * 60 * 1000)) / 1000);  //correct
-
-								  if (countdown <= 0) {
-									 $("#CountDownTimer").TimeCircles().stop();
-									 socket.emit('displayFinalResult',{
-										 roomname:roomdetails.roomname,
-										 playersocketid:socket.id
-										});
-									 clearInterval(timerId);
-									 //doSomething();
-								  } else {
-									 $("#countTime").html(min + " : " + sec);
-								  }
-
-								}, 1000); //1000ms. = 1sec.	 */ 
 					}		  
 				}else{
 					$("#menuToggler").show(500);
@@ -625,7 +611,7 @@
 	    //alert(arraysOfIds.length+" - "+data.roomlimit+" - "+targetattr);
 		if(arraysOfIds.length > data.roomlimit){
 				$("."+targetattr).html('<div id="countdown"></div>');
-			$('#strtmytune2').click();	    
+			clock.play();	    
 			countdown = $("."+targetattr).find("#countdown").countdown360({
 				radius: 25,
 				seconds:8,
@@ -636,7 +622,7 @@
 					requestTo(data.srcPlayer,targetattr,data.imgvalue,data.imgscore,data.roomlimit);
 				    $("#"+data.imgvalue).parent('.draggable').remove();
 					console.log('done');
-					$('#stopmytune2').click();	
+					clock.pause();	
 				}
 				});
 				countdown.start();
