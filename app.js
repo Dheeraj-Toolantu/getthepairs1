@@ -16,7 +16,6 @@ var con = mysql.createConnection({
     database:"getthepairs"
 });
 */
-
 con.connect(function(err) {
 		  if (err) throw err;
 		  console.log("Connected to db!");
@@ -286,10 +285,7 @@ io.sockets.on('connection', function (socket) {
 				}
 			}
 			
-			
 			socket.broadcast.emit('onlinebattleplayers', onlinebattleplayers);
-			console.log('me ahe battle player!!!'+player.pairmania_id);
-			console.log(onlinebattleplayers.length);
 		}			
 		
 		onlineplayers.push(player);
@@ -299,6 +295,7 @@ io.sockets.on('connection', function (socket) {
 		socket.emit('updaterooms', rooms);
 		socket.emit('showplayercount', onlineplayers);
 		socket.broadcast.emit('showplayercount', onlineplayers);
+		socket.emit('addquickplay');
 	});
 	
 	// when the client emits 'sendchat', this listens and executes
@@ -309,8 +306,8 @@ io.sockets.on('connection', function (socket) {
 	
 	socket.on('quickplay', function(data) {
 		
-		console.log( "Quick Play Area...");
-		if(!quickplaycount){
+		console.log( "Quick Play Area..."+data.PlayerSocketId+'....'+quickplaycount);
+		if(!quickplaycount || quickplaycount<0){
 			var roomid = new Date().valueOf();
 			quickplayroomid= roomid*(Math.round(Math.random()*100) + 1); 
 			quickplayroom={
@@ -321,7 +318,7 @@ io.sockets.on('connection', function (socket) {
 							"roompassword":'na'
 						}
 			socket.room=quickplayroomid;	
-			quickplaycount = quickplaycount+1;
+			quickplaycount = 1;
 			//console.log( "creating quickplay room..."+quickplayroom);
 			
 			var playerlimit =3;
@@ -366,7 +363,7 @@ io.sockets.on('connection', function (socket) {
 				quickplaycount=0;
 			}
 			//console.log(quickplaycount);
-		}	
+		}		
 	});
 	
 	socket.on('quickreplay', function(data) {
@@ -846,6 +843,7 @@ io.sockets.on('connection', function (socket) {
 	});
 	
 	socket.on('leaveRoom', function(data){
+		console.log('leaveRoom'+data.status);
 		if(data.status=='ready'){
 			quickplaycount=quickplaycount-1;
 		}
@@ -855,9 +853,20 @@ io.sockets.on('connection', function (socket) {
 				"pairmania_id" : data.pairmania_id,
 				"PlayerSocketId" : data.PlayerSocketId
 			}
+		
+		players = players.filter(function(item){ 
+			 return (item.PlayerSocketId !== socket.id); 
+		});
+		
+		var room = rooms.filter(function(item){ 
+					return (item.roomid == socket.room); 
+				});		
+		
 			
 		onlineplayers.push(player);
+		socket.broadcast.to(socket.room).emit('updateplayers', players ,room[0]);
 		socket.broadcast.to(socket.room).emit('updatechat', 'SERVER ', socket.username+' has left the game');
+		socket.broadcast.emit('onlineplayers', onlineplayers);
 		socket.leave(socket.room);
 	});
 	
@@ -1119,8 +1128,10 @@ io.sockets.on('connection', function (socket) {
 	});
 	
 	socket.on('imgoveralert', function (data) { 
-	    console.log('imgoveralert---'+data.trgsocketid);
-		socket.broadcast.to(data.trgsocketid).emit('imgover');
+	    console.log('imgoveralert---'+data.opponantdetails.PlayerSocketId);
+		socket.broadcast.to(data.opponantdetails.PlayerSocketId).emit('imgover');
+		socket.broadcast.to(data.opponantdetails.PlayerSocketId).emit('recreatebattleroom', data.opponantdetails);
+		socket.emit('recreatebattleroom', data.mydetails);
 	});
 	
 	socket.on('rejoinbattle', function (data) { 
