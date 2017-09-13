@@ -687,7 +687,8 @@
 	});
 	
 	function restartbattle(socketid,pairmaniaid,roomid){
-		
+		mybattleimgs =[];
+		opponantbattleimgs =[];
 	    $('#conversation').html('');		
 		socket.emit('rejoinbattle',
 		{
