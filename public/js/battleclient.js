@@ -94,9 +94,8 @@
 								$('#oppbattle').find('.blurimage').removeClass('blurimage');
 						    }); 
 							
-							putsound = document.getElementById("switch");	
-							putsound.play();
-						
+							ion.sound.play("switch");
+							
 						$('#mybattle').append('<div class="col-md-1 col-sm-1 col-xs-1"><a href="javascript:void(0)" class="thumbnail text-center" style="width:80px;height:100px"><img  src="/'+imgval+'.jpg"  img-val="'+imgval+'"><span class="badge" style="background-color:#3079AB;margin:1px;">'+imgscore+'</span></a></div>');
 						var leftPos = $('#mybattle').scrollLeft();
 						$("#mybattle").animate({scrollLeft: leftPos + 200}, 800);						
@@ -141,7 +140,7 @@
 		});
 		
 			if(i>=roomdetails.roomlimit){
-				
+				ion.sound.play("clock");
 				console.log(roomdetails.status);
 				
 				if(roomdetails.status=='pending' || roomdetails.status=='ready'){
@@ -167,8 +166,8 @@
 								
 							}
 						});
-							
-						console.log('Battle is starting in 10 sec...');
+						ion.sound.pause("clock");	
+						console.log('Battle is started...');
 						$('#targetOutcome').html('<div class="alert alert-success" style="font-size:16px">Battle has been started. Please drag your collected image and put into BATTLE AREA.</div>').delay( 10000 ).hide( 500 );;
 					    $('.'+opponantsocketId).html('<div class="text-center" style="font-size:20px;width:100%;height:100%;padding-top:20px;color:#3c763d">BATTLE AREA</div>');
 					} 
@@ -667,8 +666,7 @@
 			$('#targetOutcome').html('<div class="alert alert-success" style="font-size:16px">'+winnerdata.Playerusername+' has won the battle.&nbsp;<span id="restartbattle" style="padding-top:5px;"></span></div>');
 		}else if(winnerdata.PlayerSocketId==socket.id){
 			$('#targetOutcome').html('<div class="alert alert-success" style="font-size:16px">You have won the battle.&nbsp;<span id="restartbattle" style="padding-top:5px;"></span></div>');
-			happykids = document.getElementById("happykids");
-			happykids.play();
+			ion.sound.play("happykids");
 		}else if(loserdata.PlayerSocketId==socket.id){
 			$('#targetOutcome').html('<div class="alert alert-success" style="font-size:16px">You have lost the battle.&nbsp;<span id="restartbattle" style="padding-top:5px;"></span></div>');
 		}
