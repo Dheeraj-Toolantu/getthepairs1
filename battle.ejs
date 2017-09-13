@@ -276,13 +276,17 @@ function closescoreNav() {
 		</div>
     </div>
 </div>
-<audio id="myTune" controls loop>
-  <source src="Pride_v002.mp3">
+<audio id="switch">
+	<source src="/switch.mp3">
+</audio>
+<audio id="happykids">
+	<source src="/happykids.mp3">
 </audio>
  <script>
   
 	$(document).ready(function(){
-	    $('#myTune').hide();
+	    $('#switch').hide();
+	    $('#happykids').hide();
 		socket.on('connect', function(){
 		
 		 	playername=$('.singleuser').html();
