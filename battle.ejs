@@ -276,19 +276,16 @@ function closescoreNav() {
 		</div>
     </div>
 </div>
-<audio id="switch">
-	<source src="/switch.mp3">
-</audio>
-<audio id="happykids">
-	<source src="/happykids.mp3">
-</audio>
+<audio id="gamesound"></audio>
  <script>
   
 	$(document).ready(function(){
-	    $('#myTune').hide();
+	    $('#gamesound').hide();
 		socket.on('connect', function(){
-		
-		 	playername=$('.singleuser').html();
+		    soundelement = document.getElementById("gamesound");
+			soundelement.src = "/Puzzle-Dreams-3.mp3";
+		 	soundelement.play();
+			playername=$('.singleuser').html();
 			playerimg = $('#profile').attr('src');
 			pairmania_userid = $('#pairmania_userid').attr('value');
 			
