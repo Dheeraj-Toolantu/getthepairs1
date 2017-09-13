@@ -663,7 +663,8 @@
 		
 		console.log('winner is '+winnerdata.Playerusername)
 		if(winnerdata.PlayerSocketId!=socket.id){
-			$('#targetOutcome').html('<div class="alert alert-success" style="font-size:16px">'+winnerdata.Playerusername+' has won the battle.&nbsp;<span id="restartbattle" style="padding-top:5px;"></span></div>');
+			$('#targetOutcome').html('<div class="alert alert-success" style="font-size:16px">You have lost the battle.&nbsp;<span id="restartbattle" style="padding-top:5px;"></span></div>');
+			ion.sound.play("lost");
 		}else if(winnerdata.PlayerSocketId==socket.id){
 			$('#targetOutcome').html('<div class="alert alert-success" style="font-size:16px">You have won the battle.&nbsp;<span id="restartbattle" style="padding-top:5px;"></span></div>');
 			ion.sound.play("happykids");

@@ -10,10 +10,7 @@
 	var playerPlaying=[];
 	var playerScorecard=[];
 	var status='ready';
-	var bgmusic=0;
-	var clock = 0;
-	var putsound = 0;
-				
+	
 	// listener, whenever the server emits 'updatechat', this updates the chat body
 	socket.on('updatechat', function (username, data) {
 		$('#conversation').append('<b>'+username + ':</b> ' + data + '<br>');
@@ -36,8 +33,7 @@
 	
 	// listener, whenever the server emits 'updaterooms', this updates the room the client is in
 	socket.on('updateplayers', function(usernames,roomdetails) {
-		bgmusic = document.getElementById("myTune");
-		bgmusic.play();
+		ion.sound.play("Retro-Frantic_V001_Looping");
 		currentroomname=roomdetails.roomname;
 		currentroom=roomdetails.roomid;
 		$('#players').html('');
@@ -78,12 +74,10 @@
 									getpairs(roomdetails.roomlimit);	
 								  }, 200);
 							}); 
-						  putsound = document.getElementById("switch");	
-						  putsound.play();
-						  clock.pause();
+						  ion.sound.play("switch");
+						  ion.sound.pause("clock");
 						  }
 						});
-					  
 				}
 				$('#count').text(i);
 				i++;
@@ -91,8 +85,7 @@
 		});
 		
 			if(i>=roomdetails.roomlimit){
-			clock = document.getElementById("clock")	
-			clock.play();	
+			ion.sound.play("clock");	
 			console.log(roomdetails.status);
 				if(roomdetails.status=='pending' || roomdetails.status=='ready'){
 					
@@ -119,7 +112,7 @@
 							playersocketid:socket.id
 					});
 					status='started';
-					clock.pause();
+					ion.sound.pause("clock");
 					console.log('Game is started...');
 					$('#targetOutcome').html('<div class="bg-success text-center" style="padding:2px;">Collect <span class="badge" style="font-size:14px">'+roomdetails.roomlimit+' same pairs</span>&nbsp;<button class="btn btn-xs btn-warning" type="button" data-toggle="modal" data-target=".hint-model">Give me hint</div></div>');
 				}
@@ -611,7 +604,7 @@
 	    //alert(arraysOfIds.length+" - "+data.roomlimit+" - "+targetattr);
 		if(arraysOfIds.length > data.roomlimit){
 				$("."+targetattr).html('<div id="countdown"></div>');
-			clock.play();	    
+			ion.sound.play("clock");  
 			countdown = $("."+targetattr).find("#countdown").countdown360({
 				radius: 25,
 				seconds:8,
@@ -622,7 +615,7 @@
 					requestTo(data.srcPlayer,targetattr,data.imgvalue,data.imgscore,data.roomlimit);
 				    $("#"+data.imgvalue).parent('.draggable').remove();
 					console.log('done');
-					clock.pause();	
+					ion.sound.pause("clock");	
 				}
 				});
 				countdown.start();
