@@ -93,6 +93,9 @@
 								$(this).remove();
 								$('#oppbattle').find('.blurimage').removeClass('blurimage');
 						    }); 
+							
+							putsound = document.getElementById("switch");	
+							putsound.play();
 						
 						$('#mybattle').append('<div class="col-md-1 col-sm-1 col-xs-1"><a href="javascript:void(0)" class="thumbnail text-center" style="width:80px;height:100px"><img  src="/'+imgval+'.jpg"  img-val="'+imgval+'"><span class="badge" style="background-color:#3079AB;margin:1px;">'+imgscore+'</span></a></div>');
 						var leftPos = $('#mybattle').scrollLeft();
@@ -664,6 +667,8 @@
 			$('#targetOutcome').html('<div class="alert alert-success" style="font-size:16px">'+winnerdata.Playerusername+' has won the battle.&nbsp;<span id="restartbattle" style="padding-top:5px;"></span></div>');
 		}else if(winnerdata.PlayerSocketId==socket.id){
 			$('#targetOutcome').html('<div class="alert alert-success" style="font-size:16px">You have won the battle.&nbsp;<span id="restartbattle" style="padding-top:5px;"></span></div>');
+			happykids = document.getElementById("happykids");
+			happykids.play();
 		}else if(loserdata.PlayerSocketId==socket.id){
 			$('#targetOutcome').html('<div class="alert alert-success" style="font-size:16px">You have lost the battle.&nbsp;<span id="restartbattle" style="padding-top:5px;"></span></div>');
 		}
