@@ -224,15 +224,28 @@ fieldset{
     white-space: nowrap;
 }
 
+#mybattle .thumbnail {
+		width:80px;
+		height:100px
+	}
+	#oppbattle .thumbnail {
+		width:80px;
+		height:100px
+	}
+	#players .thumbnail{
+		width:200px;margin:0px 35% auto;
+		height:180px !important;
+		overflow: hidden !important;
+		box-shadow: 0px 1px 3px #888888;
+	}
+	
 /************************small device**************************/
 @media only screen and (max-width: 500px) {
 	.swiper-slide{
 			width:32% !important;
 			font-size:12px !important;
 		}
-   .div1 {
-			height:134px !important;
-		}
+
 	#players .media-object{
 		height:35px;
 	}
@@ -240,13 +253,13 @@ fieldset{
 	  font-size:10px;
 	}
 	
-	.draggable .thumbnail{
-		width:78px;
-		height:100px;
+	#currentuser .draggable .thumbnail{
+		width:80px !important;
+		height:90px !important;
 	}
-	.draggable .thumbnail img{
-		width:80px;
-		height:90px;
+	#currentuser .draggable .thumbnail img{
+		width:75px !important;
+		height:85px !important;
 	}
 	
 	 .swiper-container{
@@ -267,6 +280,23 @@ fieldset{
 		padding-right: 0px;
 		padding-left: 0px;
 	}
+	#mybattle .thumbnail {
+		width:50px;
+		height:70px
+	}
+	#oppbattle .thumbnail {
+		width:50px;
+		height:70px
+	}
+	#players .thumbnail{
+		margin:0px 25% auto !important;
+		height:120px !important;
+	}
+	.media-heading{
+		font-size:12px;
+		font-weight:12px;
+	}
+	
 }
 
 @media (max-width:700px) and (min-width:501px) {
@@ -283,7 +313,10 @@ fieldset{
 	#players .media h4{
 	  font-size:12px;
 	}
-	
+	#players .thumbnail{
+		margin:0px 33% auto !important;
+		height:160px !important;
+	}
 	.draggable .thumbnail{
 		width:95px;
 		height:135px;
@@ -309,6 +342,18 @@ fieldset{
 	.container{
 		padding-right: 0px;
 		padding-left: 0px;
+	}
+	#mybattle .thumbnail {
+		width:70px;
+		height:90px
+	}
+	#oppbattle .thumbnail {
+		width:70px;
+		height:90px
+	}
+	.media-heading{
+		font-size:13px;
+		font-weight:13px;
 	}
 }
 
