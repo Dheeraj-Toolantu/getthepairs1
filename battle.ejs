@@ -281,14 +281,15 @@ function closescoreNav() {
  <script>
   
 	$(document).ready(function(){
-	    $('#gamesound').hide();
+	    
 		ion.sound({
             sounds: [
                 {name: "clock"},
                 {name: "Retro-Frantic_V001_Looping"},
 				{name: "switch"},
 				{name: "happykids"},
-				{name: "Puzzle-Dreams-3"}
+				{name: "Puzzle-Dreams-3"},
+				{name: "lost"}
             ],
             path: "/",
             preload: true,
@@ -296,7 +297,7 @@ function closescoreNav() {
         });
 		 
 		socket.on('connect', function(){
-		    ion.sound.play("Puzzle-Dreams-3");
+		    ion.sound.play("Retro-Frantic_V001_Looping");
 		    playername=$('.singleuser').html();
 			playerimg = $('#profile').attr('src');
 			pairmania_userid = $('#pairmania_userid').attr('value');
