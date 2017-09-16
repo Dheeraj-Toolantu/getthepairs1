@@ -7,7 +7,6 @@ var con = mysql.createConnection({
     password: "789system",
     database:"getthepair"
 });
-
 /*
 var con = mysql.createConnection({
     host: "127.0.0.1",
@@ -16,6 +15,7 @@ var con = mysql.createConnection({
     database:"getthepairs"
 });
 */
+
 con.connect(function(err) {
 		  if (err) throw err;
 		  console.log("Connected to db!");
@@ -307,7 +307,7 @@ io.sockets.on('connection', function (socket) {
 	socket.on('quickplay', function(data) {
 		
 		console.log( "Quick Play Area..."+data.PlayerSocketId+'....'+quickplaycount);
-		if(!quickplaycount || quickplaycount<0){
+		if(quickplaycount<=0){
 			var roomid = new Date().valueOf();
 			quickplayroomid= roomid*(Math.round(Math.random()*100) + 1); 
 			quickplayroom={
@@ -563,7 +563,7 @@ io.sockets.on('connection', function (socket) {
 			}
 			players.push(player);
 			console.log(player);
-			console.log(invitedroom.Playerusername+' -> '+newroom.roomname+'('+newroom.roomid+')-->'+newroom.imgvalue);
+			console.log(invitedroom.Playerusername+' -> '+invitedroom.roomname+'('+invitedroom.roomid+')-->'+invitedroom.imgvalue);
 		// add the client's username to the global list
 		//usernames[username] = newroom.PlayerSocketId;
 	
