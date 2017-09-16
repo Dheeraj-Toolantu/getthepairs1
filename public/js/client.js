@@ -13,8 +13,8 @@
 	
 	// listener, whenever the server emits 'updatechat', this updates the chat body
 	socket.on('addquickplay', function () {
-		$('#quickplay').show();
-		$('#createRoom').show();
+		$('#quickplay').removeClass('hidebutton');
+		$('#createRoom').removeClass('hidebutton');
 	});
 	
 	socket.on('updatechat', function (username, data) {
