@@ -161,38 +161,37 @@
 			} );
 			
 	socket.on('receiveimg', function (username,data) {
+	$("#"+data.srcsocketId).droppable( "option", "disabled", true );
+	$("."+data.srcsocketId).addClass('borderRed');				
+	$("."+data.srcsocketId).html('Please Wait...');
 	var dragid = new Date().valueOf();
-	$('#currentuser').append('<div id="recievedrag-'+dragid+'" data-val="'+data.srcImg+'" data-score="'+data.imgscore+'" class="col-xs-3 col-sm-3 col-md-2 col-lg-2 draggable"  style="z-index:1"><a href="javascript:void(0)" id="'+data.srcImg+'"class="thumbnail text-center"><img  src="/'+data.srcImg+'.jpg"  img-val="'+data.srcImg+'" img-score="'+data.imgscore+'"><span class="badge">'+data.imgscore+'</span></a></div>');
-					$('#recievedrag-'+dragid).draggable({
-					  revert: 'invalid',
-					  cursor:'move'
-					})
+		$('#currentuser').append('<div id="recievedrag-'+dragid+'" data-val="'+data.srcImg+'" data-score="'+data.imgscore+'" class="col-xs-3 col-sm-3 col-md-2 col-lg-2 draggable"  style="z-index:1"><a href="javascript:void(0)" id="'+data.srcImg+'"class="thumbnail text-center"><img  src="/'+data.srcImg+'.jpg"  img-val="'+data.srcImg+'" img-score="'+data.imgscore+'"><span class="badge">'+data.imgscore+'</span></a></div>');
+		$('#recievedrag-'+dragid).draggable({
+		  revert: 'invalid',
+		  cursor:'move'
+		})
 	
 		getpairs(data.roomlimit);
-		$("#"+data.srcsocketId).droppable( "option", "disabled", false );		
-		
-		$("."+data.srcsocketId).addClass('borderGreen');				
-		$("."+data.srcsocketId).removeClass('borderRed');
-		$("."+data.srcsocketId).html('');
-		 
-		socket.emit('settimer',{
-			srcPlayer : data.srcPlayer,
-			trgPlayer : data.trgPlayer,
-			opponantsocketId:data.trgsocketId,
-			roomlimit:data.roomlimit,
-			imgvalue:data.srcImg,
-			imgscore:data.imgscore,
-			srcsocketid:data.srcsocketId
-		});
+		setTimeout(
+			function() 
+			{
+			
+				$("#"+data.srcsocketId).droppable( "option", "disabled", false );				
+				$("."+data.srcsocketId).addClass('borderGreen');				
+				$("."+data.srcsocketId).removeClass('borderRed');
+				$("."+data.srcsocketId).html('');
+					
+				socket.emit('settimer',{
+					srcPlayer : data.srcPlayer,
+					trgPlayer : data.trgPlayer,
+					opponantsocketId:data.trgsocketId,
+					roomlimit:data.roomlimit,
+					imgvalue:data.srcImg,
+					imgscore:data.imgscore,
+					srcsocketid:data.srcsocketId
+				});
 
-	/*	
-       var maxScrollLeft=$("#players").scrollLeft('#players').prop('scrollWidth') - $("#players").width();
-		var left = $(this).offset().left;
-		var width = $("#players").width();
-		var diff = left - width/2;
-		$("#players").scrollLeft($("#players").scrollLeft()+diff);
-	  */
-		
+			}, 1000);
 	});
 	
 	socket.on('alertWinner', function (data,playerScorecard,pendingPlayers,currentroomname,currentroomid,currentroomlimit) {
@@ -233,18 +232,17 @@
 			$("."+data.srcsocketId).html("<div class='alert-warning' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;"+data.playername+" is ready with pairs</div>");
 		}
 	}		
-	   //playerPlaying = pendingPlayers;
-			$.each(countdownarr, function(countkey, countval) {
-				if(countval.playersocketid==data.srcsocketId){
-					if(countval.countdownval){
-						countval.countdownval.stop();
-						$("."+data.srcsocketId).find("#countdown").remove();
-						countdownarr = countdownarr.filter(function(item){ 
-							 return (item.playersocketid !== data.srcsocketId); 
-						});		
-					}									
-				}
-			});	
+		$.each(countdownarr, function(countkey, countval) {
+			if(countval.playersocketid==data.srcsocketId){
+				if(countval.countdownval){
+					countval.countdownval.stop();
+					$("."+data.srcsocketId).find("#countdown").remove();
+					countdownarr = countdownarr.filter(function(item){ 
+						 return (item.playersocketid !== data.srcsocketId); 
+					});		
+				}									
+			}
+		});	
 				
 		if(currentroomlimit==playerimgcount){
 			playercount = parseInt(playercount) + 1;
@@ -256,7 +254,6 @@
 		$("."+data.srcsocketId).addClass('borderRed');
 		
 	});
-	
 	
 	socket.on('disableplayer', function (pendingPlayers){
 		
@@ -289,19 +286,6 @@
 		for(var l=0;l < data.length;l++){
 			$("#displayResult").append('<div class="media"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="/'+data[l].usercollec_imgval+'.jpg" alt="profile picture" height="80px" ></a></div><div class="media-body"><h4 class="media-heading"><strong>'+data[l].usercollec_username+'</strong></h4><b>&nbsp;<span class="badge">Pairs : '+data[l].usercollec_img_count+'</span>&nbsp;<span class="badge">Score : '+data[l].userscore+'</span></b></div></div>'); 
 		}
-		
-		// playerusername, usercollec_imgval, usercollec_img_count
-		/*
-		$.each(playerScorecard, function(key, value) {
-		    if(value.room==currentroom){
-				
-				$("#displayResult").append('<div class="media"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="/profile.png" alt="profile picture" height="80px" ></a></div><div class="media-body"><h4 class="media-heading"><strong>'+value.playername+'</strong></h4><b>&nbsp;<span class="badge">Rank : '+value.rank+'</span>&nbsp;<span class="badge">Coins : '+value.score+'</span></b></div></div>');
-				
-				$("#menuToggler").show(500);
-			}
-		});
-		*/
-		
 	});
 	
 	socket.on('writeFinalResult', function (data) {
@@ -339,19 +323,10 @@
 			
 			$("#writeFinalResult").append(str3);
 		}
-		/*$.each(playerScorecard, function(key, value) {
-		    if(value.room==currentroom){
-				
-				$("#writeFinalResult").append('<div class="media"><div class="media-left"><a href="javascript:void(0)"><img class="media-object" src="/profile.png" alt="profile picture" height="80px" ></a></div><div class="media-body"><h4 class="media-heading"><strong>'+value.playername+'</strong></h4><b>&nbsp;<span class="badge">Rank : '+value.rank+'</span>&nbsp;<span class="badge">Coins : '+value.score+'</span></b></div></div>');
-				
-				$("#menuToggler").show(500);
-			}
-		});*/
 		}else{
 			$("#writeFinalResult").append('<div class="alert alert-danger">Sorry :( No one is able to make any pairs!!!</div>');
 		}
 	});
-	
 	
 	socket.on('recreateroom',function(room){
 		var str = room.imgvalue;
