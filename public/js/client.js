@@ -39,8 +39,6 @@
 	
 	// listener, whenever the server emits 'updaterooms', this updates the room the client is in
 	socket.on('updateplayers', function(usernames,roomdetails) {
-		ion.sound.play("Retro-Frantic_V001_Looping");
-		ion.sound.pause("Puzzle-Dreams-3");
 		currentroomname=roomdetails.roomname;
 		currentroom=roomdetails.roomid;
 		$('#players').html('');
@@ -119,7 +117,11 @@
 							playersocketid:socket.id
 					});
 					status='started';
-					ion.sound.pause("clock");
+					if(ion.sound){
+						ion.sound.play("Retro-Frantic_V001_Looping");
+						ion.sound.pause("Puzzle-Dreams-3");
+						ion.sound.pause("clock");
+					}
 					console.log('Game is started...');
 					$('#targetOutcome').html('<div class="bg-success text-center" style="padding:2px;">Collect <span class="badge" style="font-size:14px">'+roomdetails.roomlimit+' same pairs</span>&nbsp;<button class="btn btn-xs btn-warning" type="button" data-toggle="modal" data-target=".hint-model">Give me hint</div></div>');
 				}
@@ -637,6 +639,93 @@
 			pairmania_id:pairmania_userid
 		});
 	});
+	
+	function getpairs(roomlimit){
+	
+			var oldval=0;
+			var match=0;
+			var imgcnt =1;
+			var playercount = $("#count").text();
+			if(prevtimeinterval) {
+					clearTimeout(prevtimeinterval);
+				}
+
+			var arraysOfIds = $('#getAllpairs img').map(function(){
+                       return $(this).attr('img-val');
+                   }).get();
+			console.log('arraysOfIds'+arraysOfIds.length);				   
+		    var arraysOfScore = $('#getAllpairs img').attr('img-score');
+			$('#paircomplete-alert').html('');	   
+			if(arraysOfIds.length == roomlimit){
+				for(var i=0;i<arraysOfIds.length;i++){
+					
+					var newval=arraysOfIds[i];
+				
+					if(i==0){
+						oldval = newval;
+					}else{
+						if(oldval == newval){
+							match=1;
+							imgcnt=imgcnt+1;
+						}else{
+							match=0;
+							i=arraysOfIds.length;
+						}
+					}				
+				} 
+			}
+			
+			if(match){
+				$.each(countdownarr, function(countkey, countval) {
+					if(countval.playersocketid==opponantsocketId){
+						if(countval.countdownval){
+							countval.countdownval.stop();
+							$("."+opponantsocketId).find("#countdown").remove();
+							countdownarr = countdownarr.filter(function(item){ 
+								 return (item.playersocketid !== opponantsocketId); 
+							});		
+						}									
+					}
+				});	
+				
+				$('#paircomplete-alert').html('<button class="btn btn-lg btn-success" id="paircompleted">I have made my pairs</button>');
+				$('#paircompleted').click(function(){
+					socket.emit('winner', {
+						srcsocketId:socket.id,
+						playername:playername,
+						playerPlaying:playerPlaying,
+						roomlimit:roomlimit,
+						roomid:currentroom,
+						roomname:currentroomname,
+						imgval:oldval,
+						imgscore:arraysOfScore,
+						imgcnt:imgcnt,
+						rank:rank,
+						status:'ready'
+					});
+				
+					$('#paircomplete-alert').html('');
+					   
+					prevtimeinterval = setTimeout(function () {
+						$('#targetOutcome').html('<div class="alert alert-warning" role="alert"><strong>Congratulation !!!</strong> You have successfully made the pairs.</div>');
+						ion.sound.play("happykids123");
+						socket.emit('winner', {
+							srcsocketId:socket.id,
+							playername:playername,
+							playerPlaying:playerPlaying,
+							roomlimit:roomlimit,
+							roomid:currentroom,
+							roomname:currentroomname,
+							imgval:oldval,
+							imgscore:arraysOfScore,
+							imgcnt:imgcnt,
+							rank:rank,
+							status:'done'
+						});
+					}, 2000);
+				});
+			 }
+		}
 	
 	socket.on('showmypairs',function (data){
 		$("#showmypairs").html('');
