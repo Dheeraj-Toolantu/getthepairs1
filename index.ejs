@@ -4,15 +4,16 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="/css/progress.css">
 	<link type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
     <!-- font Awesome CSS -->
-
 	<link rel="stylesheet" href="/js/TimeCircles.css" />
 
 	<link rel="stylesheet" href="/css/swiper.css">
-	 <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
-	<script type="text/javascript" src="/js/jquery.mb.audio.js"></script>
+		
+	<!-- jQuery -->
+	<script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+	<script src="/js/progress.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<!--<script src="https://cdn.rawgit.com/julianshapiro/velocity/master/velocity.min.js"></script>-->
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -33,46 +34,7 @@
         <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
-	<script>
-		var playername = '';
-		var playerimg = '';
-		var pairmania_userid = 0;
-		var prevtimeinterval=0;
-		;(function(){
-			function id(v){ return document.getElementById(v); }
-			function loadbar() {
-			var ovrl = id("overlay"),
-				prog = id("progress"),
-				stat = id("progstat"),
-				img = document.images,
-				c = 0,
-				tot = img.length;
-			if(tot == 0) return doneLoading();
-
-			function imgLoaded(){
-			  c += 1;
-			  var perc = ((100/tot*c) << 0) +"%";
-			  prog.style.width = perc;
-			  stat.innerHTML = "Loading "+ perc;
-			  if(c===tot) return doneLoading();
-			}
-			function doneLoading(){
-			  ovrl.style.opacity = 0;
-			  setTimeout(function(){ 
-				ovrl.style.display = "none";
-			  }, 1200);
-			}
-			for(var i=0; i<tot; i++) {
-			  var tImg     = new Image();
-			  tImg.onload  = imgLoaded;
-			  tImg.onerror = imgLoaded;
-			  tImg.src     = img[i].src;
-			}    
-			}
-			document.addEventListener('DOMContentLoaded', loadbar, false);
-		}());
-	</script>
-
+	
 	<style>
 		.swiper-slide{
 			width:15%;
@@ -185,7 +147,7 @@
 /***********************************************/
 @charset "utf-8";
 
-@import url//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css);
+/*@import url//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css);*/
 
 #wrapper {
   color: #606468;
@@ -514,33 +476,7 @@ a:active,a:hover{outline-width:0}abbr[title]{border-bottom:none;text-decoration:
 .w3-btn,.w3-button{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}   
 @media (max-width:992px){.w3-sidebar.w3-collapse{display:none}.w3-main{margin-left:0!important;margin-right:0!important}}
 /*****************Loading*************************/
-	#overlay{
-  position:fixed;
-  z-index:99999;
-  top:0;
-  left:0;
-  bottom:0;
-  right:0;
-  background:rgba(0,0,0,0.9);
-  transition: 1s 0.4s;
-}
-#progress{
-  height:1px;
-  background:#fff;
-  position:absolute;
-  width:0;                /* will be increased by JS */
-  top:50%;
-}
-#progstat{
-  font-size:0.7em;
-  letter-spacing: 3px;
-  position:absolute;
-  top:50%;
-  margin-top:-40px;
-  width:100%;
-  text-align:center;
-  color:#fff;
-}
+
 .hidebutton{
 	display:none;
 }
@@ -550,6 +486,10 @@ a:active,a:hover{outline-width:0}abbr[title]{border-bottom:none;text-decoration:
 	
 </head>
 <body style="overflow-x:hidden">
+<div class='progress' id="progress_div">
+    <div class='bar' id='bar1'></div>
+    <div class='percent' id='percent1'></div>
+</div>
 <% if (!user) { %>
 <div id="wrapper" class="text-center">
 	<div class="main">
@@ -571,10 +511,6 @@ a:active,a:hover{outline-width:0}abbr[title]{border-bottom:none;text-decoration:
 </div>	
 
 <% } else{ %>
-<div id="overlay">
-	<div id="progstat"></div>
-	<div id="progress"></div>
-</div>
 <input type="hidden" id="pairmania_userid" name="pairmania_userid" value="<%= user.pairmania_id %>"/>
 <div id="gamearea" class="hidepannel">
 	<div id="mySidenav" class="w3-sidebar w3-bar-block w3-border-right sidenav" style="display:none">
@@ -855,5 +791,6 @@ function closescoreNav() {
 </script>
 <script src="/js/client.js"></script>
 <% } %>
+<input type="hidden" id="progress_width" value="0">
 </body>
 </html>
