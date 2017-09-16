@@ -541,6 +541,9 @@ a:active,a:hover{outline-width:0}abbr[title]{border-bottom:none;text-decoration:
   text-align:center;
   color:#fff;
 }
+.hidebutton{
+	display:none;
+}
 </style>
 
 	<link type="text/css" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" rel="stylesheet" /> 
@@ -739,8 +742,8 @@ function closescoreNav() {
 					</div>					
 				</div><!-- /.row -->
 				<div class="media-right">
-							<button class="btn btn-info" id="quickplay" type="button" style="margin-bottom:5px;width:180px">QUICK PLAY</button>
-							<button id="createRoom" class="btn btn-success" type="button" data-toggle="modal" data-target=".create-room-model" style="margin-bottom:5px;width:180px">CREATE ROOM</button>
+							<button class="btn btn-info hidebutton" id="quickplay" type="button" style="margin-bottom:5px;width:180px">QUICK PLAY</button>
+							<button id="createRoom" class="btn btn-success hidebutton" type="button" data-toggle="modal" data-target=".create-room-model" style="margin-bottom:5px;width:180px">CREATE ROOM</button>
 							<form action="/battle" method="get">
 								<input type="hidden" id="pairmania_id" name="pairmania_id" value="<%= user.pairmania_id %>"/>
 								<input class="btn btn-primary btn-block" type="submit" value="PLAY BATTLE">
@@ -820,8 +823,6 @@ function closescoreNav() {
 	</div>
 	<script>
 	$(document).ready(function(){
-		$('#quickplay').hide();
-		$('#createRoom').hide();
 		ion.sound({
             sounds: [
                 {name: "clock"},
