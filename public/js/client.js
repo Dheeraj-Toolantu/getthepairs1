@@ -10,7 +10,7 @@
 	var playerPlaying=[];
 	var playerScorecard=[];
 	var status='ready';
-	
+	var opponantsocketId=0;
 	// listener, whenever the server emits 'updatechat', this updates the chat body
 	socket.on('addquickplay', function () {
 		$('#quickplay').removeClass('hidebutton');
@@ -60,7 +60,7 @@
 						   var target = $(event.target);
 						   var source = $(ui.draggable);
 						   var opponant = target.attr('data-opponant');
-						   var opponantsocketId = target.attr('data-opponant-socketId');
+						   opponantsocketId = target.attr('data-opponant-socketId');
 						   var imgval=source.attr("data-val");
 						   var imgscore=source.attr("data-score");
 						   
@@ -117,14 +117,19 @@
 							playersocketid:socket.id
 					});
 					status='started';
-					if(ion.sound){
-						ion.sound.play("Retro-Frantic_V001_Looping");
-						ion.sound.pause("Puzzle-Dreams-3");
-						ion.sound.pause("clock");
+					try {
+						if(ion.sound){
+							ion.sound.play("Retro-Frantic_V001_Looping");
+							ion.sound.pause("clock");
+						}
 					}
+					catch(err) {
+						console.log('ion.sound.play-->'+err);
+					}
+					
 					console.log('Game is started...');
-					$('#targetOutcome').html('<div class="bg-success text-center" style="padding:2px;">Collect <span class="badge" style="font-size:14px">'+roomdetails.roomlimit+' same pairs</span>&nbsp;<button class="btn btn-xs btn-warning" type="button" data-toggle="modal" data-target=".hint-model">Give me hint</div></div>');
-				}
+						$('#targetOutcome').html('<div class="bg-success text-center" style="padding:2px;">Collect <span class="badge" style="font-size:14px">'+roomdetails.roomlimit+' same pairs</span>&nbsp;<button class="btn btn-xs btn-warning" type="button" data-toggle="modal" data-target=".hint-model">Give me hint</div></div>');
+					}
 				});
 				
 				countdown.start();	
@@ -172,9 +177,8 @@
 		  revert: 'invalid',
 		  cursor:'move'
 		})
-	
-		getpairs(data.roomlimit);
-		setTimeout(
+	getpairs(data.roomlimit);
+	setTimeout(
 			function() 
 			{
 			
@@ -491,50 +495,6 @@
 		}
 	});
 	
-	// on load of page
-	$(function(){
-		// when the client clicks SEND
-		$('#datasend').click( function() {
-			var message = $('#data').val();
-			$('#data').val('');
-			// tell server to execute 'sendchat' and send along one parameter
-			if(message){
-				socket.emit('sendchat', message);
-			}
-		});
-
-		// when the client hits ENTER on their keyboard
-		$('#data').keypress(function(e) {
-			if(e.which == 13) {
-				$(this).blur();
-				$('#datasend').focus().click();
-			}
-		});
-		
-		// creating rooms
-		$('#roombutton').click(function(){
-			var roomid = new Date().valueOf();
-			roomid= roomid*(Math.round(Math.random()*100) + 1); 
-			var name = $('#roomname').val();
-			var roomlimit = $('#roomlimit').val();
-			var roompassword = '';
-			if(name!="" && roomlimit!=""){
-			$(this).closest('.input-group').hide(500);
-			$('#roomname').val('');
-			 
-			socket.emit('create',{
-				roomid:roomid,
-				roomname:name,
-				roomlimit:roomlimit,
-				roompassword: roompassword
-			}
-			)
-			}else{
-			 alert('Please enter the ROOM NAME and select the PLAYER LIMIT !!!');
-			}
-		});
-	});
-	
 	function requestToanother(opponant,opponantsocketId,imgval,imgscore,roomlimit){
 	    
 		socket.emit('sendimg', {
@@ -631,13 +591,6 @@
 					countdown.stop();
 				 }*/
 		}
-	});
-
-	$(document).on("click","#view_my_pairs",function(e){
-		var pairmania_userid = $('#pairmania_userid').attr('value');
-		socket.emit('getmypairs', {
-			pairmania_id:pairmania_userid
-		});
 	});
 	
 	function getpairs(roomlimit){
@@ -745,6 +698,57 @@
 		$('.'+data.PlayerSocketId).html("<div class='alert alert-success' role='alert'><span class='glyphicon glyphicon-king' aria-hidden='true'></span>&nbsp;"+data.Playerusername+" is ready to play</div>");	
 	});
 
+	// on load of page
+	$(function(){
+		// when the client clicks SEND
+		$('#datasend').click( function() {
+			var message = $('#data').val();
+			$('#data').val('');
+			// tell server to execute 'sendchat' and send along one parameter
+			if(message){
+				socket.emit('sendchat', message);
+			}
+		});
+
+		// when the client hits ENTER on their keyboard
+		$('#data').keypress(function(e) {
+			if(e.which == 13) {
+				$(this).blur();
+				$('#datasend').focus().click();
+			}
+		});
+		
+		// creating rooms
+		$('#roombutton').click(function(){
+			var roomid = new Date().valueOf();
+			roomid= roomid*(Math.round(Math.random()*100) + 1); 
+			var name = $('#roomname').val();
+			var roomlimit = $('#roomlimit').val();
+			var roompassword = '';
+			if(name!="" && roomlimit!=""){
+			$(this).closest('.input-group').hide(500);
+			$('#roomname').val('');
+			 
+			socket.emit('create',{
+				roomid:roomid,
+				roomname:name,
+				roomlimit:roomlimit,
+				roompassword: roompassword
+			}
+			)
+			}else{
+			 alert('Please enter the ROOM NAME and select the PLAYER LIMIT !!!');
+			}
+		});
+	});
+	
+	$(document).on("click","#view_my_pairs",function(e){
+		var pairmania_userid = $('#pairmania_userid').attr('value');
+		socket.emit('getmypairs', {
+			pairmania_id:pairmania_userid
+		});
+	});
+	
 	$(document).on("click","#quickplay",function(e){			
 		socket.emit('quickplay',
 		{
