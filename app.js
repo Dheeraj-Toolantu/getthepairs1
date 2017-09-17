@@ -7,6 +7,7 @@ var con = mysql.createConnection({
     password: "789system",
     database:"getthepair"
 });
+
 /*
 var con = mysql.createConnection({
     host: "127.0.0.1",
@@ -15,11 +16,10 @@ var con = mysql.createConnection({
     database:"getthepairs"
 });
 */
-
-con.connect(function(err) {
-		  if (err) throw err;
-		  console.log("Connected to db!");
-		});
+	con.connect(function(err) {
+	  if (err) throw err;
+	  console.log("Connected to db!");
+	});
 
 var express           =     require('express')
   , passport          =     require('passport')
@@ -86,7 +86,7 @@ passport.use(new FacebookStrategy({
       con.query("SELECT * from pairmania_user_info where user_info_fb_id="+profile.id,function(err,rows,fields){
         if(err) throw err;
         if(rows.length===0)
-          {
+          { 
 			var photo = '/profile.png';
 			var email = 'na';
 			if(!profile.photos[0].value) 
@@ -111,49 +111,84 @@ passport.use(new FacebookStrategy({
 ));
 
 app.get('/loginForm', function(req, res){
+	
+	if(req.query.username!==null && req.query.username!==undefined && req.query.password!==null && req.query.password!==undefined){
+		var tempuser ={
+			"username" : req.query.username,
+			"photos" : '/profile.png',
+		}
+		var ipaddr = ip.address();
+		con.query("SELECT * from pairmania_user_info where user_info_username='"+req.query.username+"'",function(err,rows,fields){
+			if(err) throw err;
+			if(rows.length>0)
+				{
+					console.log("User exists in database");
+					con.query("SELECT * from pairmania_user_info where user_info_username='"+req.query.username+"' and user_info_password='"+req.query.password+"' limit 1",function(err,rows,fields){
+						if(err) throw err;
+						if(rows.length>0){
+							tempuser["pairmania_id"]=rows[0].pairmania_id;
+							tempuser["displayName"]=rows[0].user_info_name;
+							tempuser["score"]=rows[0].user_info_score;
+							tempuser["pairs"]=rows[0].user_info_pair_cnt;
+							
+							res.render('loginsuccess', { user: tempuser });
+							if(tempuser["pairs"]>=30){
+								onlinebattleplayers.push(tempuser);
+							}
+							console.log('profile pic is '+req.query.photos);
+						}else{
+							tempuser["status"]='password_not_matching';
+							res.render('signupAlert',{ user: tempuser });
+						}
+					});
+				}
+			  else
+				{
+					tempuser["status"]='username_not_matching';
+					res.render('signupAlert',{ user: tempuser });
+				}
+			});
+		}else{
+			res.render('index',{ user: 0});
+		}
+});
+
+app.get('/signupForm', function(req, res){
 	var tempuser ={
-		"displayName" : req.query.displayName,
+		"displayName" : req.query.name,
+		"username" : req.query.username,
+		"password" : req.query.password,
 		"photos" : '/profile.png',
 	}
-	
-	var ipaddr = ip.address();
-	 con.query("SELECT * from pairmania_user_info where user_info_ip_addr='"+ipaddr+"' and user_info_fb_id='na'",function(err,rows,fields){
-        if(err) throw err;
-        if(rows.length===0)
+	if(req.query.name!=='' && req.query.username!=='' && req.query.password!==''){
+		var ipaddr = ip.address();
+		con.query("SELECT * from pairmania_user_info where user_info_username='"+req.query.username+"'",function(err,rows,fields){
+			if(err) throw err;
+			if(rows.length===0)
 			{
 				console.log("There is no such user, adding now");
-				con.query("INSERT into pairmania_user_info(user_info_name,user_info_email,user_info_img,user_info_ip_addr,user_info_gender) VALUES('"+req.query.displayName+"','na','/profile.png','"+ipaddr+"','na')",function(err,results){
+				con.query("INSERT into pairmania_user_info(user_info_name,user_info_username,user_info_password,user_info_email,user_info_img,user_info_ip_addr,user_info_gender) VALUES('"+req.query.name+"','"+req.query.username+"','"+req.query.password+"','na','/profile.png','"+ipaddr+"','na')",function(err,results){
 					if(err) throw err;
 					con.query("SELECT * from pairmania_user_info where user_info_ip_addr='"+ipaddr+"' and user_info_fb_id='na' limit 1",function(err,rows,fields){
 						if(err) throw err;
 						tempuser["pairmania_id"]=rows[0].pairmania_id;
 						tempuser["score"]=rows[0].user_info_score;
 						tempuser["pairs"]=rows[0].user_info_pair_cnt;
-						res.render('index', { user: tempuser });
-						if(tempuser["pairs"]>=30){
-							onlinebattleplayers.push(tempuser);
-						}
+						res.render('loginsuccess', { user: tempuser });
 						console.log('profile pic is '+req.query.photos);
 				   });
 				});   
 			}
-          else
+			else
             {
               console.log("User already exists in database");
-			  con.query("SELECT * from pairmania_user_info where user_info_ip_addr='"+ipaddr+"' and user_info_fb_id='na' limit 1",function(err,rows,fields){
-				if(err) throw err;
-				tempuser["pairmania_id"]=rows[0].pairmania_id;
-				tempuser["score"]=rows[0].user_info_score;
-				tempuser["pairs"]=rows[0].user_info_pair_cnt;
-				res.render('index', { user: tempuser });
-				if(tempuser["pairs"]>=30){
-					onlinebattleplayers.push(tempuser);
-				}
-				console.log('profile pic is '+req.query.photos);
-			   });
-			   
+			  
+				tempuser["status"]='username_exists';
+				res.render('signupAlert', { user: tempuser });
+				
 			}
-          });
+        }); 
+	}  
 });
 
 app.get('/battle', function(req, res){
@@ -210,8 +245,8 @@ app.get('/', function(req, res){
   res.render('index', { user: req.user });
 });
 
-app.get('/account', ensureAuthenticated, function(req, res){
-  res.render('account', { user: req.user });
+app.get('/loginsuccess', ensureAuthenticated, function(req, res){
+  res.render('loginsuccess', { user: req.user });
 });
 
 app.get('/auth/facebook', passport.authenticate('facebook',{scope:'email'}));
@@ -226,7 +261,7 @@ app.get('/auth/facebook/callback',
 		req._passport.session.user['photos'] = rows[0].user_info_img;
 		req._passport.session.user["score"]=rows[0].user_info_score;
 		req._passport.session.user["pairs"]=rows[0].user_info_pair_cnt;
-		res.render('index', { user: req._passport.session.user });
+		res.render('loginsuccess', { user: req._passport.session.user });
 		if(rows[0].user_info_pair_cnt>=30){
 			onlinebattleplayers.push(req._passport.session.user);
 		}
@@ -241,7 +276,7 @@ app.get('/logout', function(req, res){
 
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
-  res.redirect('/login')
+  res.redirect('/loginsuccess')
 }
 
 server.listen(process.env.PORT || 80 || 3000 || 4000);

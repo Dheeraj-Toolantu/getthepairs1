@@ -1,0 +1,547 @@
+<html>
+<head>
+<title>PAIR MANIA</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="/css/progress.css">
+	<link rel="stylesheet" href="/css/mainlogin.css">
+	<link type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- font Awesome CSS -->
+	<link rel="stylesheet" href="/js/TimeCircles.css" />
+	<link rel="stylesheet" href="/css/swiper.css">
+	<!-- jQuery -->
+	<script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+	<script src="/js/progress.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<!--<script src="https://cdn.rawgit.com/julianshapiro/velocity/master/velocity.min.js"></script>-->
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+	<!-- Bootstrap JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<!-- Custom JavaScript -->	
+	<script type="text/javascript" src="/js/TimeCircles.js"></script>
+	<script type="text/javascript" src="/js/counter.js"></script>
+	<script src="/js/swiper.jquery.js"></script>
+	<script src="/js/swiper.min.js"></script>
+    <script src="/js/ion.sound.js"></script>
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+	
+	<style>
+		.swiper-slide{
+			width:15%;
+			margin:2px;
+			text-align: center;
+			font-size: 18px;
+			background: #fff;
+			display: -webkit-box;
+			display: -ms-flexbox;
+			display: -webkit-flex;
+			display: flex;
+			-webkit-box-pack: center;
+			-ms-flex-pack: center;
+			-webkit-justify-content: center;
+			justify-content: center;
+			-webkit-box-align: center;
+			-ms-flex-align: center;
+			-webkit-align-items: center;
+			align-items: center;
+			overflow:hidden;
+		}
+		
+		.borderRed{
+			border: 1px solid red;
+		}
+		
+		.borderGreen{
+			border: 1px solid green;
+			animation: blinker 2s linear 5 ;
+		}
+		
+		@keyframes blinker {  
+		  10% { opacity: 0; }
+		}
+		
+		.div2 {
+			width: 69px;
+			height: 69px;
+			padding: 10px;
+			border: 1px solid green;
+		}
+		
+		.drag_me{
+		-webkit-user-drag: element;
+	}
+
+	.hidepannel{
+		/*visibility:hidden;*/
+		display: none;
+	}
+	
+	.div1 {
+		height:180px;
+		overflow:hidden;
+	}
+	.draggable .thumbnail{
+		width:135px;
+		height:160px;
+		}	
+	.draggable .thumbnail img{
+		width:132px;
+		height:150px;
+		}		
+	.media-object{
+		height:45px;
+	}	
+
+	.swiper-container{
+		height: 300px;
+	}
+	
+	.sidenav {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #f5f5f5;
+    overflow-x: hidden;
+    transition: 0.5s;
+	padding-right:10px;
+}
+
+.sidenav a {
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidenav a:hover, .offcanvas a:focus{
+    color: #000;
+}
+
+.sidenav .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+   /* margin-left: 50px;*/
+}
+
+#main {
+    transition: margin-left .5s;
+}
+
+	</style>
+		<style>
+.w3-sidebar{height:100%;width:200px;background-color:#fff;position:fixed!important;z-index:1000;overflow:hidden}
+.w3-bar-block .w3-dropdown-hover,.w3-bar-block .w3-dropdown-click{width:100%}
+.w3-bar-block .w3-dropdown-hover .w3-dropdown-content,.w3-bar-block .w3-dropdown-click .w3-dropdown-content{min-width:100%}
+.w3-bar-block .w3-dropdown-hover .w3-button,.w3-bar-block .w3-dropdown-click .w3-button{width:100%;text-align:left;padding:8px 16px}
+.w3-bar{width:100%;overflow:hidden}.w3-center .w3-bar{display:inline-block;width:auto}
+.w3-bar .w3-bar-item{padding:8px 16px;float:left;width:auto;border:none;outline:none;display:block}
+.w3-bar .w3-dropdown-hover,.w3-bar .w3-dropdown-click{position:static;float:left}
+.w3-bar .w3-button{white-space:normal}
+.w3-bar-block .w3-bar-item{width:100%;display:block;padding:8px 16px;text-align:left;border:none;outline:none;white-space:normal;float:none}
+.w3-bar-block.w3-center .w3-bar-item{text-align:center}.w3-block{display:block;width:100%}
+.w3-tiny{font-size:10px!important}.w3-small{font-size:12px!important}.w3-medium{font-size:15px!important}.w3-large{font-size:18px!important}
+.w3-button:hover{color:#000!important;background-color:#ccc!important}
+a{background-color:transparent;-webkit-text-decoration-skip:objects}
+a:active,a:hover{outline-width:0}abbr[title]{border-bottom:none;text-decoration:underline;text-decoration:underline dotted}
+.w3-btn,.w3-button{border:none;display:inline-block;outline:0;padding:8px 16px;vertical-align:middle;overflow:hidden;text-decoration:none;color:inherit;background-color:inherit;text-align:center;cursor:pointer;white-space:nowrap}
+.w3-btn:hover{box-shadow:0 8px 16px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19)}
+.w3-btn,.w3-button{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}   
+@media (max-width:992px){.w3-sidebar.w3-collapse{display:none}.w3-main{margin-left:0!important;margin-right:0!important}}
+/*****************Loading*************************/
+
+.hidebutton{
+	display:none;
+}
+</style>
+
+	<link type="text/css" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" rel="stylesheet" /> 
+	<script>
+	if (history.pushState) {
+		window.history.pushState("object or string", "Title", "/");
+	} else {
+		document.location.href = "/";
+	}
+	</script>
+</head>
+<body style="overflow-x:hidden">
+<div class='progress' id="progress_div">
+    <div class='bar' id='bar1'></div>
+    <div class='percent' id='percent1'></div>
+</div>
+<% if (!user) { %>
+<div id="wrapper" class="text-center">
+	<div class="main">
+			<div class="row">
+				<div class="col-md-12">  
+				  <div id="login">
+					<div class="logo">
+						<img src="/Pair-Mania.png" width=280>
+					</div>	
+						<form id="loginForm" action="/loginForm" method="get">
+							<div class = "form-group">
+								<input type="text" name="displayName" class = "form-control" id="username" Placeholder="Username" required>
+							</div>
+							<div class = "form-group">
+								<input type="text" name="password" class = "form-control" id="password" Placeholder="Password" required>
+							</div>
+							<input class="btn btn-primary btn-block" type="submit" value="Login">
+						</form>
+						<a href="/auth/facebook" class="btn btn-success btn-block fb_btn"></a>
+						<a href="javascript:void(0)" class="pull-right btn" data-toggle="modal" data-target=".sign-up-model" style="font-size:18px">Sign Up</a>
+						
+					<div class="clearfix"></div>
+					</div> <!-- end login -->
+				</div>
+			</div>	
+		</div>
+			
+		<div class="modal fade sign-up-model" role="dialog">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+				  <div class="modal-header" style="background-color:#dff0d8;">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove-sign"></span></button>
+					<h4 class="modal-title">Sign Up</h4>
+				  </div>
+				  <form class = "form-horizontal" action="/signupForm" method="get" role = "form">   
+				  <div class="modal-body" >
+					<div class = "form-group">
+						  <label for = "firstname" class = "col-sm-4 control-label">Name *</label>
+							
+						  <div class = "col-sm-6">
+							 <input type = "text" class = "form-control" name = "name" placeholder = "Enter Name" required>
+						  </div>
+					   </div>
+					   
+					   <div class = "form-group">
+						  <label for = "username" class = "col-sm-4 control-label">Username *</label>
+							
+						  <div class = "col-sm-6">
+							 <input type = "text" class = "form-control" name = "username" placeholder = "Enter Username" required>
+						  </div>
+					   </div>
+					   
+					   <div class = "form-group">
+						  <label for = "password" class = "col-sm-4 control-label">Password *</label>
+							
+						  <div class = "col-sm-6">
+							 <input type = "password" class = "form-control" name = "password" placeholder = "Enter Password" required>
+						  </div>
+					   </div>
+					    
+						<div class = "form-group">
+						  <label for = "confirm password" class = "col-sm-4 control-label">Confirm Password *</label>
+							
+						  <div class = "col-sm-6">
+							 <input type = "password" class = "form-control" name = "conpassword" placeholder = "Enter Password Again" required>
+						  </div>
+					   </div>
+					   
+					</div>
+				    <div class="modal-footer">
+						<button type = "submit" class = "btn btn-success">Submit</button>
+						<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+					</div>
+				</form>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div>
+</div>	
+
+<% } else{ %>
+<input type="hidden" id="pairmania_userid" name="pairmania_userid" value="<%= user.pairmania_id %>"/>
+<div id="gamearea" class="hidepannel">
+	<div id="mySidenav" class="w3-sidebar w3-bar-block w3-border-right sidenav" style="display:none">
+		<div class="row" onclick="closeNav()">
+			<div style="padding:5px 10px 5px 10px;background:#616161!important;color:#fff!important">
+			<div class="media-left">
+				<a href="javascript:void(0)">
+					<img id="profile" class="media-object" src="<%= user.photos %>" alt="profile picture" height=50 >
+				</a>
+			</div>
+			<div class="media-body">
+				<h4><strong class="singleuser"><%= user.displayName %></strong></h4>
+			</div>
+			<div class="media-right">
+				<a href="javascript:void(0)" onclick="closeNav()" style="color:#fff!important"><i class="glyphicon glyphicon-remove-sign"></i></a>
+			</div>
+			</div>
+		</div>
+		<div class="row" id="onlineplayers"></div>
+	</div>
+
+	<div id="mySidenav_scorecard" class="w3-sidebar w3-bar-block w3-border-right sidenav" style="display:none">
+		<div class="row" onclick="closescoreNav()">
+			<div style="padding:5px 5px 5px 15px;background:#616161!important;color:#fff!important">
+				<h4>Players Scorecard&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-remove-sign"></span></h4>
+			</div>
+	    </div>
+		<div class="row" id="displayResult" style="max-height:700px;overflow-y:scroll;">
+		
+		</div>
+	</div>
+
+<script>
+function openNav() {
+    document.getElementById("mySidenav").style.display = "block";
+}
+function closeNav() {
+    document.getElementById("mySidenav").style.display = "none";
+}
+
+function openscoreNav() {
+    document.getElementById("mySidenav_scorecard").style.display = "block";
+}
+function closescoreNav() {
+    document.getElementById("mySidenav_scorecard").style.display = "none";
+}
+</script>
+
+	<div id="main">
+		<div class="panel panel-default">
+			<div class="panel-heading" style="padding:0px;overflow:hidden;">
+				<div class="pull-right" id="CountDownTimer" data-timer="300" style="width:auto;height:48px;margin-right:5px;margin-top:-5px;"></div>
+				<div class="panel-title">
+					<ul class="nav nav-pills" style="height:35px;">
+					  <li role="presentation"><a id="menuToggler" type="button" href="javascript:void(0);" onclick="openNav()" title="Invite Player"><span class="glyphicon glyphicon-plus"></span></a></li>
+					  <li role="presentation"><a type="button" href="javascript:void(0);" onclick="openscoreNav()" title="View Scorecard"><span class="glyphicon glyphicon-list-alt"></span></a></li>
+					  <li role="presentation"><a type="button" href="javascript:void(0);" title="Player joined"><span class="glyphicon glyphicon-user"></span><span class="badge" id="count" style="line-height:none;"></span></a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="panel-body">	
+				<div  class="row text-center"><div class="col-md-12" id="restartGame"></div></div>
+				<div id="targetOutcome"></div>
+				<div id="writeFinalResult" class="col-md-12 col-xs-12 col-sm-12"></div>
+				<div class="row">
+					<div class="col-md-12 col-xs-12 col-sm-12">
+						<div class="swiper-container">
+							<div id="players" class="swiper-wrapper" style="transform:translate3d(1px, 0px, 0px);"></div>
+							<!-- Add Pagination -->
+							<div class="swiper-pagination"></div>
+							 <!-- Add Arrows -->
+						</div>
+						
+						<script>
+							var swiper = new Swiper('.swiper-container', {
+								pagination: '.swiper-pagination',
+								slidesPerView: 'auto',
+								paginationClickable: true,
+								spaceBetween: 30,
+								freeMode: true,
+								autoplay: 2500,
+								autoplayDisableOnInteraction: false
+							});
+		
+						</script>
+					</div>
+				</div>	
+				
+				<div class="col-md-12 col-xs-12 col-sm-12 text-center" id="paircomplete-alert"></div>
+				<div class="row" id="getAllpairs">		
+					<div class="text-center" id="currentuser"></div>
+				</div>
+				<div class="row">
+					<div id="conversation" class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="max-height:300px;overflow-y:scroll;"></div>
+				</div>
+				<div class="row">
+				  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+					<div class="input-group">
+					  <input type="text" id="data" class="form-control" placeholder="CHAT">
+					  <span class="input-group-btn">
+						 <button class="btn btn-default" id="datasend" type="button">SEND</button>
+					  </span>
+					</div><!-- /input-group -->
+				  </div><!-- /.col-lg-6 -->
+				</div><!-- /.row -->
+			</div>
+		</div>
+		<div class="modal fade hint-model" tabindex="-1" role="dialog">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+				  <div class="modal-header" style="background-color:#dff0d8;">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove-sign"></span></button>
+					<h4 class="modal-title">You have to make following pairs to win the game and coins.</h4>
+				  </div>
+				  <div class="modal-body" >
+					<div class="list-group" id="pairmania-hint">
+					</div>
+				  </div>
+				  <div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">CLOSE</button>
+				  </div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal-dialog -->
+		</div>
+    </div>
+</div>
+
+	<div id="homearea" class="panel panel-default">
+		<div class="panel-heading">
+			<b class="pull-right">&nbsp;<a href="javascript:void(0)">PLAYERS ONLINE <span class="badge" id="allcount"></span></a></b>
+			<h3 class="panel-title">WELCOME TO <strong>PAIRMANIA GAME</strong></h3>
+		</div>
+		<div class="panel-body">
+		<div class="row">
+			<div class="container">
+		<div class="col-md-12">	
+			<div class="media">
+				<div class="media-left">
+					<a href="javascript:void(0)">
+						<img class="media-object" src="<%= user.photos %>" alt="profile picture" height=80 >
+					</a> 
+				</div>
+				<div class="media-body">
+					<h4 class="media-heading singleuser"><strong><%= user.displayName %></strong></h4>
+					<h5 class="media-heading"><strong><span class="badge"><%= user.score %>&nbsp;COINS</span></strong></h5>
+					<h6 class="media-heading"><strong><span class="badge"><%= user.pairs %>&nbsp;PAIRS</span></strong></h6>
+					<a href="javascript:void(0)" data-toggle="modal" data-target=".view-pairssummary-model">VIEW PAIRS</a>
+					<div class="modal fade view-pairssummary-model" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+					  <div class="modal-dialog modal-lg" role="document">
+						<div class="modal-content">
+							<div class="panel panel-default">
+								<div class="panel-heading">
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove-sign"></span></button>
+									<div class="btn-group" role="group" aria-label="Large button group"> 
+										<button type="button" id="view_my_pairs" class="btn btn-md btn-sm btn-xs btn-success">VIEW MY PAIRS</button> 
+										<button type="button" class="btn btn-md btn-sm btn-xs btn-info">VIEW TOP PLAYERS</button> 
+										<button type="button" class="btn btn-md btn-sm btn-xs btn-default">VIEW TOP PAIRS</button> 
+									</div>
+								</div>
+								<div class="row" id="showmypairs" style="padding:5px;">
+								</div>
+							</div>
+						</div>
+					  </div>
+					</div>					
+				</div><!-- /.row -->
+				<div class="media-right">
+							<button class="btn btn-info hidebutton" id="quickplay" type="button" style="margin-bottom:5px;width:180px">QUICK PLAY</button>
+							<button id="createRoom" class="btn btn-success hidebutton" type="button" data-toggle="modal" data-target=".create-room-model" style="margin-bottom:5px;width:180px">CREATE ROOM</button>
+							<form action="/battle" method="get">
+								<input type="hidden" id="pairmania_id" name="pairmania_id" value="<%= user.pairmania_id %>"/>
+								<input class="btn btn-primary btn-block" type="submit" value="PLAY BATTLE">
+							</form>
+							<div class="modal fade create-room-model" tabindex="-1" role="dialog">
+							  <div class="modal-dialog" role="document">
+								<div class="modal-content">
+								  <div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span class="glyphicon glyphicon-remove-sign"></span></button>
+									<h4 class="modal-title">CREATE YOUR ROOM</h4>
+								  </div>
+								  <div class="modal-body">
+									<p>
+										<div class="input-group">
+										  <span class="input-group-addon" id="basic-addon1">ROOM NAME</span>
+										  <input type="text" id="roomname" class="form-control" placeholder="ROOM NAME" aria-describedby="ROOM NAME">
+										</div>
+									</p>
+									<p>
+										<div class="input-group">
+										    <span class="input-group-addon" id="basic-addon1">PLAYER LIMIT</span>
+											<select id="roomlimit" class="form-control">
+											  <option value="">PLAYER LIMIT</option>
+											  <option value="3">3</option>
+											  <option value="4">4</option>
+											  <option value="5">5</option>
+											  <option value="6">6</option>
+											  <option value="7">7</option>
+											  <option value="8">8</option>
+											</select>
+										</div>
+									</p>
+								  </div>
+								  <div class="modal-footer">
+									<button type="button" class="btn btn-default" data-dismiss="modal">CLOSE</button>
+									<button type="button" id="roombutton"  class="btn btn-primary">CREATE</button>
+								  </div>
+								</div><!-- /.modal-content -->
+							  </div><!-- /.modal-dialog -->
+							</div>
+						</div><!-- /.col-lg-6 -->
+					</div>
+				</div>	
+			</div>
+			</div>
+			<br>
+			<div class="row">
+				<div class="container">
+				<div class="col-md-6 col-sm-6 col-xs-6">
+					
+					<div class="panel panel-default">
+					<div class="panel-heading">
+					<h3 class="panel-title">JOIN ROOMS</h3>
+					</div>
+					<div class="panel-body">
+					
+					<ul class="list-group" id="rooms">
+					</ul>
+					</div>
+					</div>
+				</div>
+				<div class="col-md-6 col-sm-6 col-xs-6">
+					<div class="panel panel-default">
+					<div class="panel-heading">
+					<h3 class="panel-title">INVITATIONS</h3>
+					</div>
+					<div class="panel-body">
+					
+					<ul class="list-group" id="invitations">
+					</ul>
+					</div>
+					</div>
+				</div>
+			</div>
+			</div>
+		</div>
+	</div>
+	<script>
+	$(document).ready(function(){
+		ion.sound({
+            sounds: [
+                {name: "clock"},
+                {name: "Retro-Frantic_V001_Looping"},
+				{name: "switch"},
+				{name: "happykids123"},
+				{name: "Puzzle-Dreams-3"},
+				{name: "lost"}
+            ],
+            path: "/",
+            preload: true,
+            volume: 1.0
+        });
+		
+		socket.on('connect', function(){
+		   // ion.sound.play("Puzzle-Dreams-3");
+			playername=$('.singleuser').html();
+			playerimg = $('#profile').attr('src');
+			pairmania_userid = $('#pairmania_userid').attr('value');
+			socket.emit('adduser',{
+				Playerusername : playername, 
+				Playerimg : playerimg, 
+				pairmania_id : pairmania_userid,
+				PlayerSocketId : socket.id
+			});
+		});
+	
+	});
+		
+</script>
+<script src="/js/client.js"></script>
+<% } %>
+<input type="hidden" id="progress_width" value="0">
+</body>
+</html>

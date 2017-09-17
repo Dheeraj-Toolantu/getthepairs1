@@ -1,0 +1,160 @@
+<html>
+<html>
+	<head>
+	<title>PAIR MANIA</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="/css/progress.css">
+	<link type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- font Awesome CSS -->
+	<!-- jQuery -->
+	<script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+	<script src="/js/progress.js"></script>
+	<!-- Bootstrap JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- Custom JavaScript -->	
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+	
+<style>
+#wrapper {
+  color: #606468;
+  font: 87.5%/1.5em 'Open Sans', sans-serif;
+  margin: 0;
+}
+
+#wrapper .main{
+background: #0264d6; /* Old browsers */
+background: -moz-radial-gradient(center, ellipse cover,  #0264d6 1%, #1c2b5a 100%); /* FF3.6+ */
+background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(1%,#0264d6), color-stop(100%,#1c2b5a)); /* Chrome,Safari4+ */
+background: -webkit-radial-gradient(center, ellipse cover,  #0264d6 1%,#1c2b5a 100%); /* Chrome10+,Safari5.1+ */
+background: -o-radial-gradient(center, ellipse cover,  #0264d6 1%,#1c2b5a 100%); /* Opera 12+ */
+background: -ms-radial-gradient(center, ellipse cover,  #0264d6 1%,#1c2b5a 100%); /* IE10+ */
+background: radial-gradient(ellipse at center,  #0264d6 1%,#1c2b5a 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0264d6', endColorstr='#1c2b5a',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+height:calc(100vh);
+width:100%;
+}
+
+[class*="fontawesome-"]:before {
+  font-family: 'FontAwesome', sans-serif;
+}
+</style>
+<script>
+	if (history.pushState) {
+		window.history.pushState("object or string", "Title", "/signupForm");
+	} else {
+		document.location.href = "/signupForm";
+	}
+</script>	
+</head>
+<body style="overflow-x:hidden">
+<% if (user) {  pass=0; sign=0;%>
+<div id="wrapper" class="text-center">
+	<div class="main">
+		<div class="row">
+			<% if(user.status==="username_exists"){ sign=1; %>
+			<div class="col-md-12"> 
+				<div class="alert alert-danger">Username is already Exists. Please provide different username.</div>
+			</div>
+			<% } else if(user.status==="username_not_matching"){ pass=1; sign=1; %>
+			<div class="col-md-12">
+				<div class="alert alert-danger">Username doesn't exists. Please create the account to play the game.</div>
+			</div>
+			<% } else if(user.status==="password_not_matching"){ pass=1; %>
+				<div class="col-md-12">
+					<div class="alert alert-danger">Password is not matching. Please try again</div>
+				</div>
+			<% } %>
+			<% if(pass) {%>
+			<div class="panel panel-warning">					
+				<div class="panel-heading">
+					<h4>Login</h4>
+				</div>
+				<div class="panel-body">						
+					<form class = "form-horizontal" action="/loginForm" method="get" role="form">
+						<div class = "form-group">
+							<label for = "username" class = "col-sm-4 control-label">Username</label>
+
+							<div class = "col-sm-6">
+								<input type = "text" class = "form-control" name = "username" value="<%= user.username %>" Placeholder="Username" required>
+							</div>
+						</div>
+						
+						<div class = "form-group">
+							<label for = "Password" class = "col-sm-4 control-label">Password</label>
+
+							<div class = "col-sm-6">
+								<input type = "password" class = "form-control" name = "password" Placeholder="Password" required>
+							</div>
+						</div>
+						<div class = "form-group">
+							<button type = "submit" class = "btn btn-success">Login</button>
+						</div>
+					</form>
+				</div>
+			</div>
+			<% } %>
+			<% if(sign) {%>
+			<div class="col-md-12">
+				<div class="panel panel-info">					
+					<div class="panel-heading">
+						<h4>Sign Up</h4>
+					</div>
+					<div class="panel-body">
+						<form class = "form-horizontal" action="/signupForm" method="get" role = "form">   
+								<div class = "form-group">
+								  <label for = "firstname" class = "col-sm-4 control-label">Name</label>
+									
+								  <div class = "col-sm-6">
+									 <input type = "text" class = "form-control" name = "name" value="<%= user.displayName %>" placeholder = "Enter Name" required>
+								  </div>
+							   </div>
+							   
+							   <div class = "form-group">
+								  <label for = "username" class = "col-sm-4 control-label">Username</label>
+									
+								  <div class = "col-sm-6">
+									 <input type = "text" class = "form-control" name = "username" value="<%= user.username %>" placeholder = "Enter Username" required>
+								  </div>
+							   </div>
+							   
+							   <div class = "form-group">
+								  <label for = "password" class = "col-sm-4 control-label">Password</label>
+									
+								  <div class = "col-sm-6">
+									 <input type = "password" class = "form-control" name = "password" placeholder = "Enter Password" required>
+								  </div>
+							   </div>
+								
+								<div class = "form-group">
+								  <label for = "confirm password" class = "col-sm-4 control-label">Confirm Password</label>
+									
+								  <div class = "col-sm-6">
+									 <input type = "password" class = "form-control" name	 = "conpassword" placeholder = "Enter Password Again" required>
+								  </div>
+							   </div>
+						</div>
+						<div class = "form-group">
+							<button type = "submit" class = "btn btn-success">Submit</button>
+							<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+						</div>
+					</form>
+					</div>
+				</div>
+			<% } %>	
+			</div>
+		</div>	
+	</div>
+
+<% }%>
+		<input type="hidden" id="progress_width" value="0">
+	</body>
+</html>
