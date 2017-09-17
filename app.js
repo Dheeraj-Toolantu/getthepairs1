@@ -110,9 +110,29 @@ passport.use(new FacebookStrategy({
   }
 ));
 
+
+app.set('views', __dirname + '/');
+app.set('view engine', 'ejs');
+app.use(cookieParser('keyboard cat'));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(session(
+{ secret: 'keyboard cat',
+ resave: true,
+ saveUninitialized: true
+ }
+ ));
+app.use(passport.initialize());
+app.use(passport.session({ secret: 'keyboard cat',
+ key: 'sid'}));
+app.use(express.static(__dirname + '/public'));
+
+
 app.get('/loginForm', function(req, res){
 	
 	if(req.query.username!==null && req.query.username!==undefined && req.query.password!==null && req.query.password!==undefined){
+		sess = req.session;
+		sess.username = req.query.username;
+		sess.photos = '/profile.png';
 		var tempuser ={
 			"username" : req.query.username,
 			"photos" : '/profile.png',
@@ -131,6 +151,10 @@ app.get('/loginForm', function(req, res){
 							tempuser["score"]=rows[0].user_info_score;
 							tempuser["pairs"]=rows[0].user_info_pair_cnt;
 							
+							sess.pairmania_id=tempuser["pairmania_id"];
+							sess.displayName=tempuser["displayName"];
+							sess.score=tempuser["score"];
+							sess.pairs=tempuser["pairs"];
 							res.render('loginsuccess', { user: tempuser });
 							if(tempuser["pairs"]>=30){
 								onlinebattleplayers.push(tempuser);
@@ -154,13 +178,17 @@ app.get('/loginForm', function(req, res){
 });
 
 app.get('/signupForm', function(req, res){
-	var tempuser ={
-		"displayName" : req.query.name,
-		"username" : req.query.username,
-		"password" : req.query.password,
-		"photos" : '/profile.png',
-	}
+	
 	if(req.query.name!=='' && req.query.username!=='' && req.query.password!==''){
+		sess = req.session;
+		var tempuser ={
+			"displayName" : req.query.name,
+			"username" : req.query.username,
+			"password" : req.query.password,
+			"photos" : '/profile.png',
+		}
+		sess.username = req.query.username;
+		sess.photos = '/profile.png';
 		var ipaddr = ip.address();
 		con.query("SELECT * from pairmania_user_info where user_info_username='"+req.query.username+"'",function(err,rows,fields){
 			if(err) throw err;
@@ -174,6 +202,10 @@ app.get('/signupForm', function(req, res){
 						tempuser["pairmania_id"]=rows[0].pairmania_id;
 						tempuser["score"]=rows[0].user_info_score;
 						tempuser["pairs"]=rows[0].user_info_pair_cnt;
+						sess.pairmania_id=tempuser["pairmania_id"];
+						sess.displayName=tempuser["displayName"];
+						sess.score=tempuser["score"];
+						sess.pairs=tempuser["pairs"];
 						res.render('loginsuccess', { user: tempuser });
 						console.log('profile pic is '+req.query.photos);
 				   });
@@ -226,23 +258,14 @@ app.get('/battle', function(req, res){
           });
 });
 
-app.set('views', __dirname + '/');
-app.set('view engine', 'ejs');
-app.use(cookieParser('keyboard cat'));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(session(
-{ secret: 'keyboard cat',
- resave: true,
- saveUninitialized: true
- }
- ));
-app.use(passport.initialize());
-app.use(passport.session({ secret: 'keyboard cat',
- key: 'sid'}));
-app.use(express.static(__dirname + '/public'));
-
 app.get('/', function(req, res){	
-  res.render('index', { user: req.user });
+  sess = req.session;
+  if(sess.username){
+	res.render('loginsuccess', { user: sess });
+  }else{
+	res.render('index', { user: 0 });
+  }
+  console.log('I m here in index...'+sess.username);
 });
 
 app.get('/loginsuccess', ensureAuthenticated, function(req, res){
@@ -254,14 +277,23 @@ app.get('/auth/facebook', passport.authenticate('facebook',{scope:'email'}));
 app.get('/auth/facebook/callback',
   passport.authenticate('facebook',{scope:'email'}),
   function(req, res) {
+	  sess = req.session;
 	  //console.log(req._passport.session.user.name.givenName);
 	   con.query("SELECT * from pairmania_user_info where user_info_fb_id="+req._passport.session.user.id,function(err,rows,fields){
         if(err) throw err;
+		req._passport.session.user['displayName'] = rows[0].user_info_name;
 		req._passport.session.user['pairmania_id'] = rows[0].pairmania_id;
 		req._passport.session.user['photos'] = rows[0].user_info_img;
 		req._passport.session.user["score"]=rows[0].user_info_score;
 		req._passport.session.user["pairs"]=rows[0].user_info_pair_cnt;
+		sess.pairmania_id=rows[0].pairmania_id;
+		sess.username=rows[0].user_info_fb_id;
+		sess.displayName=rows[0].user_info_name;
+		sess.score=rows[0].user_info_score;
+		sess.pairs=rows[0].user_info_pair_cnt;
+		sess.photos=rows[0].user_info_img;
 		res.render('loginsuccess', { user: req._passport.session.user });
+		
 		if(rows[0].user_info_pair_cnt>=30){
 			onlinebattleplayers.push(req._passport.session.user);
 		}
@@ -276,7 +308,7 @@ app.get('/logout', function(req, res){
 
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) { return next(); }
-  res.redirect('/loginsuccess')
+  res.redirect('/index')
 }
 
 server.listen(process.env.PORT || 80 || 3000 || 4000);
