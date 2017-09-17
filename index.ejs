@@ -4,12 +4,11 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<!-- Bootstrap CSS -->
-	<link rel="stylesheet" href="/css/progress.css">
 	<link type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
     <!-- font Awesome CSS -->
 	<!-- jQuery -->
 	<script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
-	<script src="/js/progress.js"></script>
+	
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 	<!-- Bootstrap JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -197,10 +196,6 @@ fieldset{
 <link type="text/css" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" rel="stylesheet" /> 
 </head>
 <body style="overflow-x:hidden">
-<div class='progress' id="progress_div">
-    <div class='bar' id='bar1'></div>
-    <div class='percent' id='percent1'></div>
-</div>
 <% if (!user) { %>
 <div id="wrapper" class="text-center">
 	<div class="main">
@@ -280,6 +275,5 @@ fieldset{
 		</div>
 </div>	
 <% } %>
-<input type="hidden" id="progress_width" value="0">
 </body>
 </html>
