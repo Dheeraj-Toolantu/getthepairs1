@@ -364,7 +364,7 @@ a.blurimage{
 		
 		var imgvalue=['1','2','18','19','20','3','4','5','9','10','11','1','2','12','6','7','8','9','10','20','3','4','5','9','10','11','12','13','14','15','16','17','18','19','12','13','14','15','20','21'];
 	    
-		for(var i=0;i<10;i++){
+		for(var i=0;i<30;i++){
 			var j = Math.floor(Math.random() * 20) + 0; 
 			var imgscore = Math.floor(Math.random() * 500) + 50; 
 			$('#currentuser').append('<div data-val="'+imgvalue[j]+'" data-score="'+imgscore+'" class="col-xs-3 col-sm-2 col-md-2 col-lg-2 guessimg guesscomp"><a href="javascript:void(0)" class="thumbnail text-center blurimage"><img  src="/'+imgvalue[j]+'.jpg" img-val="'+imgvalue[j]+'"><span class="badge">'+imgscore+'</span></a></div>');
