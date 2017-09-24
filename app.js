@@ -1,6 +1,5 @@
 var path = require("path");  
 var mysql = require('mysql');
-
 var con = mysql.createConnection({
     host: "getthepair.cr1a92pwyyql.us-east-2.rds.amazonaws.com",
     user: "toolantu",
@@ -256,6 +255,31 @@ app.get('/battle', function(req, res){
 					console.log("User already exists in database");
 				}
           });
+});
+
+app.get('/singleplay', function(req, res){
+	console.log('singleplay'+req.query.pairmania_id);
+	var pairmania_id = req.query.pairmania_id;
+	var tempuser ={};
+	var ipaddr = ip.address();
+	con.query("SELECT * from pairmania_user_info where pairmania_id="+pairmania_id+"",function(err,rows,fields){
+        if(err) throw err;
+			console.log(rows.length);
+			
+				if(rows.length)
+				{
+					
+						tempuser["displayName"]=rows[0].user_info_name;
+						tempuser["pairmania_id"]=rows[0].pairmania_id;
+						tempuser["score"]=rows[0].user_info_score;
+						tempuser["pairs"]=rows[0].user_info_pair_cnt;
+						tempuser["photos"]=rows[0].user_info_img;
+						tempuser["status"]='eligible';
+						res.render('singleplay', { user: tempuser });
+						
+				}
+					
+			});
 });
 
 app.get('/', function(req, res){	
