@@ -341,7 +341,8 @@ a.blurimage{
 				{name: "switch"},
 				{name: "happykids"},
 				{name: "Puzzle-Dreams-3"},
-				{name: "lost"}
+				{name: "lost"},
+				{name: "ting"}
             ],
             path: "/",
             preload: true,
@@ -349,7 +350,7 @@ a.blurimage{
         });
 		 
 		socket.on('connect', function(){
-		    ion.sound.play("Retro-Frantic_V001_Looping");
+		    //ion.sound.play("Retro-Frantic_V001_Looping");
 		    playername=$('.media-heading').html();
 			playerimg = $('#profile').attr('src');
 			pairmania_userid = $('#pairmania_userid').attr('value');
@@ -396,7 +397,8 @@ a.blurimage{
 			if(mind){
 				console.log(mycollection[mind-1].imgvalue);
 				if(mycollection[mind-1].imgvalue==imgvalue){
-				    mycount++;
+				    ion.sound.play("ting");
+					mycount++;
 					imgscore=imgscore*mycount;
 					$('#alertmsg').html('<span class="badge green-bg" >Hurray!!! You have got one more chance</span>');
 					mybattleimg1={
@@ -649,6 +651,7 @@ a.blurimage{
 						});
 						
 					}else if(parseInt(mycollection[mind-1].imgscore)>parseInt(computercollection[cind-1].imgscore)){
+						ion.sound.play("ting");
 						var y =$("#me").find(".thumbnail");
 						th2=$("#me").find(".thumbnail").eq(y.length-1);
 						th2.css("background-color", "#dff0d8");
