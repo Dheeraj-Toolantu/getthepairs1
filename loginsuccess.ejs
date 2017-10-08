@@ -739,9 +739,13 @@ function closescoreNav() {
 								<input type="hidden" id="pairmania_id" name="pairmania_id" value="<%= user.pairmania_id %>"/>
 								<input class="btn btn-primary btn-block" type="submit" value="PLAY BATTLE">
 							</form>
-							<form action="/singleplay" method="get">
+							<form action="/singleplay1" method="get">
 								<input type="hidden" id="pairmania_id" name="pairmania_id" value="<%= user.pairmania_id %>"/>
-								<input class="btn btn-primary btn-block" type="submit" value="SINGLE PLAYER">
+								<input class="btn btn-primary btn-block" type="submit" value="SINGLE PLAYER 1">
+							</form>
+							<form action="/singleplay2" method="get">
+								<input type="hidden" id="pairmania_id" name="pairmania_id" value="<%= user.pairmania_id %>"/>
+								<input class="btn btn-primary btn-block" type="submit" value="SINGLE PLAYER 2">
 							</form>
 							<div class="modal fade create-room-model" tabindex="-1" role="dialog">
 							  <div class="modal-dialog" role="document">
