@@ -1,0 +1,1092 @@
+<html>
+<head>
+<title>PAIR MANIA</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <!-- Bootstrap CSS -->
+	<link rel="stylesheet" href="/css/bootstrap_upd.css">
+    <!-- font Awesome CSS -->
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+   
+	<link rel="stylesheet" href="/js/TimeCircles.css" />
+    <!-- Main Styles CSS -->
+     <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+	
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="https://cdn.rawgit.com/julianshapiro/velocity/master/velocity.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+	<!-- Bootstrap JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<!-- Custom JavaScript -->	
+	<script type="text/javascript" src="/js/TimeCircles.js"></script>
+	<script type="text/javascript" src="/js/counter.js"></script>
+	<script type="text/javascript" src="/js/jquery.animateNumber.min.js"></script>
+	<script src="/js/ion.sound.js"></script>
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+	<script>
+		var playername = '';
+		var playerimg = '';
+		var pairmania_userid = 0;
+	</script>
+	<style>
+.receiveimg:before{
+	float:left
+	position:absolute;
+	display: block;
+}
+.blue-bg{
+	background-color:#337ab7;
+	margin:1px;
+}
+.green-bg{
+	background-color:#4CAF50;
+	margin:1px;
+}
+.guessimg{
+	min-height:100px;
+	min-width:80px;
+	max-height:180px;
+	max-width:160px;
+}
+</style>
+
+	<style>
+		
+		.borderRed{
+			border: 1px solid red;
+		}
+		
+		.borderGreen{
+			border: 1px solid green;
+			animation: blinker 2s linear 5 ;
+			
+		}
+		
+		@keyframes blinker {  
+		  10% { opacity: 0; }
+		}
+		
+		.div2 {
+			width: 69px;
+			height: 69px;
+			padding: 10px;
+			border: 1px solid green;
+		}
+		
+		.drag_me{
+		-webkit-user-drag: element;
+	}
+
+	.hidepannel{
+		/*visibility:hidden;*/
+		display: none;
+	}
+	
+	.div1 {
+		height:180px !important;
+	}
+	.draggable .thumbnail{
+		width:135px;
+		height:160px;
+		}	
+	.draggable .thumbnail img{
+		width:132px;
+		height:150px;
+		}		
+	.media-object{
+		height:45px !important;
+	}	
+	/*
+	#oppbattle{
+		 overflow-x: scroll;
+	}
+	
+	#oppbattle::-webkit-scrollbar-track
+	{
+		-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+		background-color: #F5F5F5;
+	}
+
+	#oppbattle::-webkit-scrollbar
+	{
+		width: 2px;
+		background-color: #F5F5F5;
+	}
+
+	#oppbattle::-webkit-scrollbar-thumb
+	{
+		background-color: #000000;
+		border: 1px solid #555555;
+	}
+	
+	#mybattle{
+		 overflow-x: scroll;
+	}
+	#mybattle::-webkit-scrollbar-track
+	{
+		-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+		background-color: #F5F5F5;
+	}
+
+	#mybattle::-webkit-scrollbar
+	{
+		width: 2px;
+		background-color: #F5F5F5;
+	}
+
+	#mybattle::-webkit-scrollbar-thumb
+	{
+		background-color: #000000;
+		border: 1px solid #555555;
+	}
+	*/
+	#overlay{
+  position:fixed;
+  z-index:99999;
+  top:0;
+  left:0;
+  bottom:0;
+  right:0;
+  background:rgba(0,0,0,0.9);
+  transition: 1s 0.4s;
+}
+#progress{
+  height:1px;
+  background:#fff;
+  position:absolute;
+  width:0;                /* will be increased by JS */
+  top:50%;
+}
+#progstat{
+  font-size:0.7em;
+  letter-spacing: 3px;
+  position:absolute;
+  top:50%;
+  margin-top:-40px;
+  width:100%;
+  text-align:center;
+  color:#fff;
+}
+	</style>
+	<style>
+
+
+*{	margin:0;	padding:0; }
+
+body{
+	background:#eaeaea;
+	color:#fff;
+	font-size:18px;
+	font-family: 'Exo 2', sans-serif;
+}
+
+a{
+	color:#34495e;	
+}
+
+
+/*WRAPPER*/
+#wrapper{ 
+	margin: 40px auto 0;	
+	width:266px; 
+	position:relative;
+}
+
+#txt{
+	color:#eaeaea;	
+}
+
+
+/*WHEEL*/
+#wheel{
+	width:250px;
+	height:250px;
+	border-radius:50%;	
+	position:relative;
+	overflow:hidden;
+	border:8px solid #fff;
+	box-shadow:rgba(0,0,0,0.2) 0px 0px 10px, rgba(0,0,0,0.05) 0px 3px 0px;
+	transform: rotate(0deg);
+}
+
+#wheel:before{
+	content:'';
+	position:absolute;
+	border:4px solid rgba(0,0,0,0.1);
+	width:242px;
+	height:242px;
+	border-radius:50%;
+	z-index:1000;	
+}
+
+#inner-wheel{
+	width:100%;
+	height:100%;
+	
+	-webkit-transition: all 6s cubic-bezier(0,.99,.44,.99);
+	-moz-transition:    all 6 cubic-bezier(0,.99,.44,.99);
+	-o-transition:      all 6s cubic-bezier(0,.99,.44,.99);
+	-ms-transition:     all 6s cubic-bezier(0,.99,.44,.99);
+	transition:         all 6s cubic-bezier(0,.99,.44,.99);	
+}
+
+#wheel div.sec{
+	position: absolute;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 130px 75px 0;
+	border-color: #19c transparent;
+	transform-origin: 75px 129px;
+	left:50px;
+	top:-4px;	
+	opacity:1;
+}
+
+#wheel div.sec:nth-child(1){
+	transform: rotate(60deg);
+	-webkit-transform: rotate(60deg);
+	-moz-transform: rotate(60deg);
+	-o-transform: rotate(60deg);
+	-ms-transform: rotate(60deg);
+	border-color: #16a085 transparent;	
+}
+#wheel div.sec:nth-child(2){
+	transform: rotate(120deg);
+	-webkit-transform: rotate(120deg);
+	-moz-transform: rotate(120deg);
+	-o-transform: rotate(120deg);
+	-ms-transform: rotate(120deg);
+	border-color: #2980b9 transparent;	
+}
+#wheel div.sec:nth-child(3){
+	transform: rotate(180deg);
+	-webkit-transform: rotate(180deg);
+	-moz-transform: rotate(180deg);
+	-o-transform: rotate(180deg);
+	-ms-transform: rotate(180deg);
+	border-color: #34495e transparent;	
+}
+#wheel div.sec:nth-child(4){
+	transform: rotate(240deg);
+	-webkit-transform: rotate(240deg);
+	-moz-transform: rotate(240deg);
+	-o-transform: rotate(240deg);
+	-ms-transform: rotate(240deg);
+	border-color: #f39c12 transparent;	
+}
+#wheel div.sec:nth-child(5){
+	transform: rotate(300deg);
+	-webkit-transform: rotate(300deg);
+	-moz-transform: rotate(300deg);
+	-o-transform: rotate(300deg);
+	-ms-transform: rotate(300deg);
+	border-color: #d35400 transparent;	
+}
+#wheel div.sec:nth-child(6){
+	transform: rotate(360deg);
+	-webkit-transform: rotate(360deg);
+	-moz-transform: rotate(360deg);
+	-o-transform: rotate(360deg);
+	-ms-transform: rotate(360deg);
+	border-color: #c0392b transparent;	
+}
+
+
+#wheel div.sec .fa{
+	margin-top: -124px;
+	color: #fff;
+	position: relative;
+	z-index: 10000000;
+	display: block;
+	text-align: center;
+	font-size:16px;
+	margin-left:-20px;
+	text-shadow: rgba(255, 255, 255, 0.1) 0px -1px 0px, rgba(0, 0, 0, 0.2) 0px 1px 0px;
+}
+
+#spin{
+	width:68px;
+	height:68px;
+	position:absolute;
+	top:50%;
+	left:50%;
+	margin:-34px 0 0 -34px;
+	border-radius:50%;
+	box-shadow:rgba(0,0,0,0.1) 0px 3px 0px;
+	z-index:1000;
+	background:#fff;
+	cursor:pointer;
+	font-family: 'Exo 2', sans-serif;
+  
+  -webkit-user-select: none; 
+  -moz-user-select: none;    
+  -ms-user-select: none;     
+  -o-user-select: none;
+  user-select: none;   
+}
+
+
+#spin:after{
+	content:"SPIN";	
+	text-align:center;
+	line-height:68px;
+	color:#CCC;
+	text-shadow: 0 2px 0 #fff, 0 -2px 0 rgba(0,0,0,0.3) ;
+	position: relative;
+	z-index: 100000;
+	width:68px;
+	height:68px;
+	display:block;
+}
+
+#spin:before{
+	content:"";
+	position:absolute;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 0 20px 28px 20px;
+	border-color: transparent transparent #ffffff transparent;
+	top:-12px;
+	left:14px;
+}
+
+#inner-spin{
+	width:54px;
+	height:54px;
+	position:absolute;
+	top:50%;
+	left:50%;
+	margin:-27px 0 0 -27px;
+	border-radius:50%;
+	background:red;
+	z-index:999;
+	box-shadow:rgba(255,255,255,1) 0px -2px 0px inset, rgba(255,255,255,1) 0px 2px 0px inset,  rgba(0,0,0,0.4) 0px 0px 5px ;
+	
+	background: rgb(255,255,255); /* Old browsers */
+	background: -moz-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%, rgba(234,234,234,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(255,255,255,1)), color-stop(100%,rgba(234,234,234,1))); /* Chrome,Safari4+ */
+	background: -webkit-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%,rgba(234,234,234,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%,rgba(234,234,234,1) 100%); /* Opera 12+ */
+	background: -ms-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%,rgba(234,234,234,1) 100%); /* IE10+ */
+	background: radial-gradient(ellipse at center,  rgba(255,255,255,1) 0%,rgba(234,234,234,1) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#eaeaea',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */	
+}
+
+#spin:active #inner-spin{
+	box-shadow:rgba(0,0,0,0.4) 0px 0px 5px inset;
+}
+
+#spin:active:after{
+	font-size:15px;	
+}
+
+
+
+#shine{
+	width:250px;
+	height:250px;
+	position:absolute;
+	top:0;
+	left:0;
+	background: -moz-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%, rgba(255,255,255,0.99) 1%, rgba(255,255,255,0.91) 9%, rgba(255,255,255,0) 100%); /* FF3.6+ */
+background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(255,255,255,1)), color-stop(1%,rgba(255,255,255,0.99)), color-stop(9%,rgba(255,255,255,0.91)), color-stop(100%,rgba(255,255,255,0))); /* Chrome,Safari4+ */
+background: -webkit-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%,rgba(255,255,255,0.99) 1%,rgba(255,255,255,0.91) 9%,rgba(255,255,255,0) 100%); /* Chrome10+,Safari5.1+ */
+background: -o-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%,rgba(255,255,255,0.99) 1%,rgba(255,255,255,0.91) 9%,rgba(255,255,255,0) 100%); /* Opera 12+ */
+background: -ms-radial-gradient(center, ellipse cover,  rgba(255,255,255,1) 0%,rgba(255,255,255,0.99) 1%,rgba(255,255,255,0.91) 9%,rgba(255,255,255,0) 100%); /* IE10+ */
+background: radial-gradient(ellipse at center,  rgba(255,255,255,1) 0%,rgba(255,255,255,0.99) 1%,rgba(255,255,255,0.91) 9%,rgba(255,255,255,0) 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#00ffffff',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
+
+opacity:0.1;
+	
+}
+
+
+
+/*ANIMATION*/
+@-webkit-keyframes hh {
+  0%, 100%{
+    transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+  }
+
+  50%{
+    transform: rotate(7deg);
+    -webkit-transform: rotate(7deg);
+  }
+}
+
+@keyframes hh {
+   0%, 100%{
+    transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+  }
+
+  50%{
+    transform: rotate(7deg);
+    -webkit-transform: rotate(7deg);
+  }
+}
+
+.spin {
+  -webkit-animation: hh 0.1s; /* Chrome, Safari, Opera */
+    animation: hh 0.1s;
+}
+
+	</style>
+	<link type="text/css" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" rel="stylesheet" /> 
+	<script>
+	;(function(){
+  function id(v){ return document.getElementById(v); }
+  function loadbar() {
+    var ovrl = id("overlay"),
+        prog = id("progress"),
+        stat = id("progstat"),
+        img = document.images,
+        c = 0,
+        tot = img.length;
+    if(tot == 0) return doneLoading();
+
+    function imgLoaded(){
+      c += 1;
+      var perc = ((100/tot*c) << 0) +"%";
+      prog.style.width = perc;
+      stat.innerHTML = "Loading "+ perc;
+      if(c===tot) return doneLoading();
+    }
+    function doneLoading(){
+      ovrl.style.opacity = 0;
+      setTimeout(function(){ 
+        ovrl.style.display = "none";
+      }, 1200);
+    }
+    for(var i=0; i<tot; i++) {
+      var tImg     = new Image();
+      tImg.onload  = imgLoaded;
+      tImg.onerror = imgLoaded;
+      tImg.src     = img[i].src;
+    }    
+  }
+  document.addEventListener('DOMContentLoaded', loadbar, false);
+}());
+	</script>
+	
+</head>
+<body style="overflow-x:hidden">
+	<div id="overlay">
+		<div id="progstat"></div>
+		<div id="progress"></div>
+	</div>
+
+<% if (!user) { %>
+
+<div id="wrapper" class="text-center">
+	<div class="main">
+			<div class="row">
+				<div class="col-md-12">  
+				  <div id="login">
+					<div class="logo"><img src="/Pair-Mania.png" width=280>
+						<form id="loginForm" action="/loginForm" method="get">
+							<input type="text" name="displayName" id="username" Placeholder="Username" required>
+							<input class="btn btn-primary btn-block" type="submit" value="Play">
+							<a href="/auth/facebook" class="btn btn-success btn-block fb_btn"></a>
+						</form>
+					<div class="clearfix"></div>
+					</div> <!-- end login -->
+				</div>
+			</div>	
+		</div>
+	</div>
+</div>	
+
+<% } else { %>
+<input type="hidden" id="pairmania_userid" name="pairmania_userid" value="<%= user.pairmania_id %>"/>
+<div id="gamearea">
+	<div id="main">
+		<div id="wrapper">            
+			<div id="wheel">
+				<div id="inner-wheel">
+				</div>       
+			   
+				<div id="spin">
+					<div id="inner-spin"></div>
+				</div>
+				
+				<div id="shine"></div>
+			</div>
+		</div>
+		<div class="panel panel-default">
+		    <div class="panel-heading" style="padding:0px;overflow:hidden;">	
+			    <div class="row text-center" style="position:absolute;margin:15px 40% 0;width:200px;" >
+					<div class="col-md-12" id="alertmsg"></div>
+				</div>
+				<div class="pull-right" id="CountDownTimer" data-timer="300" style="width:auto;height:50px;margin-right:5px;margin-top:-5px;"></div>
+				<h3 class="panel-title">
+				    <ul class="nav nav-pills" style="height:25px;">
+					  <li role="presentation"><a type="button" href="http://www.pairmania.com" title="Leave The Room"><span class="glyphicon glyphicon-off"></span></a></li>
+					  <li role="presentation"><a type="button" href="javascript:void(0)" onclick="window.location=window.location.href" title="Refresh"><span class="glyphicon glyphicon-refresh"></span></a></li>
+					</ul>
+				</h3>
+				
+			</div>
+			<div class="panel-body">
+				<div  id="battleplayers" class="row">
+					<div class="col-md-5 col-lg-5 col-sm-12 col-xs-12"><div class="media"><div class="media-left"><img src="/thepair.png" class="media-object thumbnail"></div><div class="media-body"><h4 class="media-heading" style="color:#000">Computer (<span id="compscore" class="badge blue-bg">0</span>)</h4><div id="computer"></div></div></div></div>
+					<div class="col-md-5 col-lg-5 col-sm-12 col-xs-12"><div class="media"><div class="media-left"><img id="profile" src="<%= user.photos %>" class="media-object thumbnail"></div><div class="media-body"><h4 class="media-heading" style="color:#000"><%= user.displayName %> (<span id="myscore" class="badge green-bg">0</span>)</h4><div id="me"></div></div></div></div>
+				</div>
+				<div class="row text-center">
+					<div class="col-md-12" id="alertmsg"></div>
+				</div>
+				<div  class="row">
+					<div id="targetOutcome" class="col-md-12 col-sm-12 col-xs-12"></div>
+				</div>
+				<div  class="row">
+					<div class="col-md-12 col-sm-12 col-xs-12" id="writeFinalResult"></div>
+					<div class="text-center col-md-12 col-sm-12 col-xs-12"><div id="players"></div></div>
+					<div class="col-md-12 col-sm-12 col-xs-12" id="restartGame" style="margin:5px;"></div> 
+				</div>
+				
+				<div class="row">
+					<div class="col-md-12 text-center">
+						<div id="finalpair"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+ <script>
+
+	$(document).ready(function(){
+			
+			var mycollection =[];
+			var computercollection=[];
+			var mycount=1;
+			var compcount=1;
+            var spincounter=0;
+			var getbattlearr=[];
+			
+			//set default degree (360*5)
+			var degree = 1800;
+			//number of clicks = 0
+			var clicks = 0;
+			var prevtimeinterval=0;
+
+	    var socket = io.connect();
+		ion.sound({
+            sounds: [
+                {name: "clock"},
+                {name: "Retro-Frantic_V001_Looping"},
+				{name: "switch"},
+				{name: "happykids"},
+				{name: "Puzzle-Dreams-3"},
+				{name: "lost"},
+				{name: "spin"},
+				{name: "ting"}
+            ],
+            path: "/",
+            preload: true,
+            volume: 1.0
+        });
+		 
+		socket.on('connect', function(){
+		//	ion.sound.play("Retro-Frantic_V001_Looping");
+		    playername=$('.media-heading').html();
+			playerimg = $('#profile').attr('src');
+			pairmania_userid = $('#pairmania_userid').attr('value');
+			getbattleimg();
+		});
+		
+	
+		function getbattleimg() {
+			$('#alertmsg').html('<span class="badge green-bg" >Click on the any unknown Card</span>');
+			$('#currentuser').html('');
+			$("#menuToggler").hide(500);
+			
+			var imgvalue=['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21'];
+			
+			for(var i=0;i<12;i++){
+				var j = Math.floor(Math.random() * 21) + 0; 
+				var imgscore = Math.floor(Math.random() * 500) + 50; 
+					$('#inner-wheel').append('<div class="sec" data-val="'+imgvalue[j]+'" data-score="'+imgscore+'"><span class="fa"><img class="img-circle" src="	/'+imgvalue[j]+'.jpg" height="48"/>&nbsp;<span class="badge">'+imgscore+'<span></span></div>');
+				getbattleimg={
+					imgvalue:imgvalue[j],
+					imgscore:imgscore
+				};
+				getbattlearr.push(getbattleimg);
+				i++;
+			}
+			
+		}
+
+var checkclick=0;
+	
+	/*WHEEL SPIN FUNCTION*/
+	$('#spin').click(function(){
+		
+		if(!checkclick){
+		ion.sound.play("spin");
+		//add 1 every click
+		clicks ++;
+		
+		/*multiply the degree by number of clicks
+	  generate random number between 1 - 360, 
+    then add to the new degree*/
+		var newDegree = degree*clicks;
+		var extraDegree = Math.floor(Math.random() * (360 - 1 + 1)) + 1;
+		totalDegree = newDegree+extraDegree;
+		
+		/*let's make the spin btn to tilt every
+		time the edge of the section hits 
+		the indicator*/
+		var incr =0;	
+		var leastval=0;
+		$('#wheel .sec').each(function(){
+			var t = $(this);
+			var noY = 0;
+			
+			var c = 0;
+			var n = 700;	
+			imgval=0;
+			imgscore=0;
+			 
+		
+			 var interval = setInterval(function () {
+				c++;
+                			
+				if (c === n) { 
+					clearInterval(interval);
+					
+			        if(!incr){
+							incr++;
+							
+							clearTimeout(prevtimeinterval);
+							prevtimeinterval = setTimeout(function () {
+							    checkclick=1;
+								getmyimgval(imgval,imgscore);
+							}, 1000);
+								
+						}					
+				}	
+					
+				var aoY = t.offset().top;
+				//$("#txt").html(aoY);
+				
+				/*23.7 is the minumum offset number that 
+				each section can get, in a 30 angle degree.
+				So, if the offset reaches 23.7, then we know
+				that it has a 30 degree angle and therefore, 
+				exactly aligned with the spin btn*/
+				if(aoY < 23.88){
+					console.log('<<<<<<<<');
+					console.log(aoY);
+					if(leastval<aoY){
+						leastval=aoY;
+						aoY=leastval;
+					}else{
+						aoY=leastval;
+					}
+					$('#spin').addClass('spin');
+					
+					setTimeout(function () { 
+						$('#spin').removeClass('spin');
+						imgval = t.attr('data-val');
+						imgscore = t.attr('data-score');
+						
+					}, 200);	
+					
+				}
+			},10);
+			
+			
+			
+			$('#inner-wheel').css({
+				'transform' : 'rotate(' + totalDegree + 'deg)'			
+			});
+		 
+			noY = t.offset().top;
+			
+		});
+	 }
+	});	
+
+	function getmyimgval(val,score){
+	
+	   console.log(val+"->my");
+	   var mybattleimg1={};
+	   var imgscore=0;
+	   var imgvalue=0;
+	   var myscore=0;
+		var len = getbattlearr.length-1;	
+		for(var i=0;i<=len;i++){ 	
+			if(getbattlearr[i].imgvalue==val){
+				console.log('value---'+getbattlearr[i].imgvalue);
+				if(i!=0){
+				    imgscore=getbattlearr[i-1].imgscore;
+					imgvalue=getbattlearr[i-1].imgvalue;
+					$('#me').append('<img src="/'+getbattlearr[i-1].imgvalue+'.jpg" height="50px"/>')
+					i=len;
+					
+				}else if(i==0){
+				    imgscore=getbattlearr[len].imgscore;
+					imgvalue=getbattlearr[len].imgvalue;
+					$('#me').append('<img src="/'+getbattlearr[len].imgvalue+'.jpg" height="50px"/>')
+					i=len;
+				}
+			}		
+		}
+		
+	if(spincounter<=3){	
+		var mind = mycollection.length;
+		console.log('gfdhgfhjgkh--jhkj'+mind);
+		if(mind){
+			console.log(mycollection[mind-1].imgvalue);
+			
+			if(mycollection[mind-1].imgvalue==imgvalue){
+				mycount++;
+				if(mycount<=2){				
+					ion.sound.play("ting");
+					imgscore=imgscore*mycount;
+					$('#alertmsg').html('<span class="badge green-bg" >Hurray!!! You have got one more chance</span>');
+					mybattleimg1={
+						imgvalue:imgvalue,
+						imgscore:imgscore
+					};
+		
+					mycollection.push(mybattleimg1);
+					checkclick=0;
+					
+					var y =$("#me").find("img");
+					console.log('Y'+y.length);
+					
+					var th1=0;
+					for(var k=1;k<=mycount;k++){
+						th1=$("#me").find("img").eq(y.length-k);
+						th1.css("background-color", "#dff0d8");
+					}
+				}else{
+				    $('#alertmsg').html('<span class="badge green-bg" >Opps!!! You have got three pairs</span>');
+					$('#me').html('');
+					mycollection = mycollection.filter(function(item){ 
+							return (item.imgvalue !== imgvalue); 
+						});
+					var len = mycollection.length-1;	
+					for(var i=0;i<=len;i++){ 
+						$('#me').append('<img src="/'+mycollection[len].imgvalue+'.jpg" height="50px"/>');
+						myscore=myscore+mycollection[len].imgscore;
+					}
+					setTimeout(function () {
+						compturn();
+						checkclick=1;
+						spincounter++;
+						mycount=1;
+					},500);
+					$('#myscore').animateNumber({ number: myscore });
+				}
+			}else{
+					mybattleimg1={
+						imgvalue:imgvalue,
+						imgscore:imgscore
+					};
+		
+					$('#alertmsg').html("<span class='badge blue-bg' >Computer's Turn </span>");
+					mycollection.push(mybattleimg1);
+					setTimeout(function () {
+						compturn();
+						checkclick=1;
+						spincounter++;
+					},500);
+			}
+        }else{
+			mybattleimg1={
+						imgvalue:imgvalue,
+						imgscore:imgscore
+					};
+		
+					$('#alertmsg').html("<span class='badge blue-bg' >Computer's Turn </span>");
+					mycollection.push(mybattleimg1);
+					setTimeout(function () {
+						compturn();
+						checkclick=1;
+						spincounter++;
+					},500);
+		}
+			for(var i=0;i<mycollection.length;i++){
+					myscore=parseInt(myscore)+parseInt(mycollection[i].imgscore);
+				}
+				$('#myscore').html(myscore);
+				$('#myscore').animateNumber({ number: myscore });
+		}else{
+		   setTimeout(
+				  function() 
+				  { 
+				
+					gameover();
+				
+			},2000);
+		}
+		
+	}
+
+	function compturn(){
+			ion.sound.play("spin");
+		//add 1 every click
+		clicks ++;
+		
+		/*multiply the degree by number of clicks
+	  generate random number between 1 - 360, 
+    then add to the new degree*/
+		var newDegree = degree*clicks;
+		var extraDegree = Math.floor(Math.random() * (360 - 1 + 1)) + 1;
+		totalDegree = newDegree+extraDegree;
+		
+		/*let's make the spin btn to tilt every
+		time the edge of the section hits 
+		the indicator*/
+		var incr =0;
+		var leastval=0;		
+		$('#wheel .sec').each(function(){
+			var t = $(this);
+			var noY = 0;
+			
+			var c = 0;
+			var n = 700;	
+			imgval=0;
+			imgscore=0;
+			
+		
+			 var interval = setInterval(function () {
+				c++;
+                			
+				if (c === n) { 
+					clearInterval(interval);
+					
+			        if(!incr){
+							incr++;
+							
+							clearTimeout(prevtimeinterval);
+							prevtimeinterval = setTimeout(function () {
+								getcompimgval(imgval,imgscore);
+								checkclick=0;
+							}, 2000);
+						}					
+				}	
+					
+				var aoY = t.offset().top;
+				//$("#txt").html(aoY);
+				//console.log(aoY);
+				
+				/*23.7 is the minumum offset number that 
+				each section can get, in a 30 angle degree.
+				So, if the offset reaches 23.7, then we know
+				that it has a 30 degree angle and therefore, 
+				exactly aligned with the spin btn*/
+				if(aoY < 23.88){
+					console.log('<<<<<<<<');
+					$('#spin').addClass('spin');
+					if(leastval<aoY){
+						leastval=aoY;
+						aoY=leastval;
+					}else{
+						aoY=leastval;
+					}
+					setTimeout(function () { 
+						$('#spin').removeClass('spin');
+							imgval = t.attr('data-val');
+							imgscore=t.attr('data-score');
+					}, 200);	
+					
+				}
+			},10);
+			
+			$('#inner-wheel').css({
+				'transform' : 'rotate(' + totalDegree + 'deg)'			
+			});
+		 
+			noY = t.offset().top;
+			
+		});
+	}
+	
+	function getcompimgval(val,score){	
+		
+		var compbattleimg1={};
+	    var imgscore=0;
+	    var imgvalue=0;
+		var compscore=0;
+		var len = getbattlearr.length-1;	
+		for(var i=0;i<=len;i++){ 	
+			if(getbattlearr[i].imgvalue==val){
+				if(i!=0){
+					imgscore=getbattlearr[i-1].imgscore;
+					imgvalue=getbattlearr[i-1].imgvalue;
+					console.log(imgvalue+"->comp");
+		
+					$('#computer').append('<img src="/'+getbattlearr[i-1].imgvalue+'.jpg" height="50px"/>')
+					i=len;
+				}else if(i==0){
+				    imgscore=getbattlearr[len].imgscore;
+					imgvalue=getbattlearr[len].imgvalue;
+					console.log(imgvalue+"->comp");
+					$('#computer').append('<img src="/'+getbattlearr[len].imgvalue+'.jpg" height="50px"/>')
+					i=len;
+				}
+			}		
+		}
+		
+		
+		if(spincounter<=3){	
+			$('#alertmsg').html("<span class='badge green-bg'>Your's Turn</span>");
+			var cind = computercollection.length;
+			if(cind){
+				console.log(computercollection[cind-1].imgvalue);
+				if(computercollection[cind-1].imgvalue==imgvalue){
+					compcount++;
+					var y =$("#computer").find("img");
+					console.log('Y'+y.length);
+					var th1=0;
+					for(var k=1;k<=compcount;k++){
+						th1=$("#computer").find("img").eq(y.length-k);
+						th1.css("background-color", "#d9edf7");
+					}
+					
+					imgscore=imgscore*compcount;
+					$('#alertmsg').html("<span class='badge blue-bg' >Computer will get one more chance</span>");
+					computerbattleimg={
+						imgvalue:imgvalue,
+						imgscore:imgscore
+					};
+					computercollection.push(computerbattleimg);
+					compturn();
+				}else{
+					computerbattleimg={
+						imgvalue:imgvalue,
+						imgscore:imgscore
+					};
+					computercollection.push(computerbattleimg);
+				}
+			}else{
+				computerbattleimg={
+						imgvalue:imgvalue,
+						imgscore:imgscore
+					};
+				computercollection.push(computerbattleimg);
+			}
+			
+			clickcheck=0;
+			for(var i=0;i<computercollection.length;i++){
+			
+				compscore=parseInt(compscore)+parseInt(computercollection[i].imgscore);
+			}
+			console.log('computer score'+compscore);
+			$('#compscore').html(compscore);
+			$('#compscore').animateNumber({ number: compscore });
+		}else{
+			 setTimeout(
+				  function() 
+				  { 
+				
+					gameover();
+				    checkclick++;
+			},1000);
+		}
+	}
+	
+	var isloopcheck=0;
+	function gameover(){
+	    
+		var compscore = $('#compscore').html();
+		var myscore = $('#myscore').html();
+		console.log(compscore+'-------'+myscore);
+		if(parseInt(compscore)>parseInt(myscore)){
+			$('#alertmsg').html("<span class='badge blue-bg' >Computer Win !!!</span>");
+			ion.sound.play("lost");
+		}else{
+		$('#alertmsg').html("<span class='badge green-bg' >You Win !!!</span>");
+		ion.sound.play("happykids");
+		
+		if(mycollection.push.apply(mycollection, computercollection) && isloopcheck==0){
+			console.log('after--'+mycollection.length);
+			
+			var sorted_arr = mycollection.sort(sort_by('imgvalue', true, parseInt));
+			console.log('sorted_arr'+sorted_arr);			
+			var results = [];
+			for (var i = 0; i < mycollection.length - 1; i++) {
+				if (sorted_arr[i + 1].imgvalue == sorted_arr[i].imgvalue) {
+					results.push(sorted_arr[i].imgvalue);
+				}
+				
+			}
+			displayresult(results);
+			isloopcheck++;
+		}
+		
+		}
+	}
+	var sort_by = function(field, reverse, primer){
+
+	   var key = primer ? 
+		   function(x) {return primer(x[field])} : 
+		   function(x) {return x[field]};
+
+	   reverse = !reverse ? 1 : -1;
+
+	   return function (a, b) {
+		   return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+		 } 
+	}
+	
+	function displayresult(arr){
+	    
+		if(arr.length){
+			var finalresult=[];
+			var finalcol={};
+			for(var i=0;i<=arr.length-1;i++){
+				var score=0;
+				var checkcount=0;
+				for(var j=0;j<=mycollection.length-1;j++){
+					if(arr[i]==mycollection[j].imgvalue){
+						score = score+parseInt(mycollection[j].imgscore); 
+					checkcount++;
+					}
+				}
+				if(checkcount){
+					score=parseInt(score/checkcount);
+					finalcol={
+						imgvalue:arr[i],
+						imgscore:score
+					};
+					finalresult.push(finalcol);
+				}
+			}
+			console.log(finalresult);
+			var oldimgvalue=0;
+			$('#finalpair').append('<div class="alert alert-success"><h4>Congratulation!!! You have made the following pairs: </h4></div>');
+			for(var i=0;i<finalresult.length;i++){
+				if(oldimgvalue!=finalresult[i].imgvalue){
+				$('#finalpair').append('<div class="col-xs-3 col-sm-2 col-md-2 col-lg-2"><a href="javascript:void(0)" class="thumbnail text-center"><img  src="/'+finalresult[i].imgvalue+'.jpg" ><span class="badge green-bg">'+finalresult[i].imgscore+'</span></a></div>');
+			    }
+				oldimgvalue=finalresult[i].imgvalue;
+			}
+		}else{
+			$('#finalpair').append('<div class="alert alert-danger">Sorry!!! unfortunately you are unable to make pairs</div>');
+		}		
+	}
+	
+})
+</script>
+<% } %>
+</body>
+</html>
+  

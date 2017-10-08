@@ -1,0 +1,678 @@
+<html>
+<head>
+<title>PAIR MANIA</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <!-- Bootstrap CSS -->
+	<link type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- font Awesome CSS -->
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+
+	<link rel="stylesheet" href="/js/TimeCircles.css" />
+    <!-- Main Styles CSS -->
+    <link href="/css/main.css" rel="stylesheet">
+	
+	<link rel="stylesheet" href="/css/swiper.css">
+	 <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
+	
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="https://cdn.rawgit.com/julianshapiro/velocity/master/velocity.min.js"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+	<!-- Bootstrap JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<!-- Custom JavaScript -->	
+	<script type="text/javascript" src="/js/TimeCircles.js"></script>
+	<script type="text/javascript" src="/js/counter.js"></script>
+	<script type="text/javascript" src="/js/jquery.animateNumber.min.js"></script>
+	<script src="/js/swiper.min.js"></script>
+    <script src="/js/ion.sound.js"></script>
+	<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+	<script>
+		var playername = '';
+		var playerimg = '';
+		var pairmania_userid = 0;
+	</script>
+	<style>
+.w3-sidebar{height:100%;width:200px;background-color:#fff;position:fixed!important;z-index:1000;overflow:hidden}
+.w3-bar-block .w3-dropdown-hover,.w3-bar-block .w3-dropdown-click{width:100%}
+.w3-bar-block .w3-dropdown-hover .w3-dropdown-content,.w3-bar-block .w3-dropdown-click .w3-dropdown-content{min-width:100%}
+.w3-bar-block .w3-dropdown-hover .w3-button,.w3-bar-block .w3-dropdown-click .w3-button{width:100%;text-align:left;padding:8px 16px}
+.w3-bar{width:100%;overflow:hidden}.w3-center .w3-bar{display:inline-block;width:auto}
+.w3-bar .w3-bar-item{padding:8px 16px;float:left;width:auto;border:none;outline:none;display:block}
+.w3-bar .w3-dropdown-hover,.w3-bar .w3-dropdown-click{position:static;float:left}
+.w3-bar .w3-button{white-space:normal}
+.w3-bar-block .w3-bar-item{width:100%;display:block;padding:8px 16px;text-align:left;border:none;outline:none;white-space:normal;float:none}
+.w3-bar-block.w3-center .w3-bar-item{text-align:center}.w3-block{display:block;width:100%}
+.w3-tiny{font-size:10px!important}.w3-small{font-size:12px!important}.w3-medium{font-size:15px!important}.w3-large{font-size:18px!important}
+.w3-button:hover{color:#000!important;background-color:#ccc!important}
+a{background-color:transparent;-webkit-text-decoration-skip:objects}
+a:active,a:hover{outline-width:0}abbr[title]{border-bottom:none;text-decoration:underline;text-decoration:underline dotted}
+.w3-btn,.w3-button{border:none;display:inline-block;outline:0;padding:8px 16px;vertical-align:middle;overflow:hidden;text-decoration:none;color:inherit;background-color:inherit;text-align:center;cursor:pointer;white-space:nowrap}
+.w3-btn:hover{box-shadow:0 8px 16px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19)}
+.w3-btn,.w3-button{-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}   
+@media (max-width:992px){.w3-sidebar.w3-collapse{display:none}.w3-main{margin-left:0!important;margin-right:0!important}}
+
+a.blurimage{
+	content:url('/guess.jpg');
+	top: 0px;
+	height:auto;
+	max-width: 100%;  
+	display: block;
+    background:url('/guess.jpg');
+}
+.receiveimg:before{
+	float:left
+	position:absolute;
+	display: block;
+}
+.blue-bg{
+	background-color:#337ab7;
+	margin:1px;
+}
+.green-bg{
+	background-color:#4CAF50;
+	margin:1px;
+}
+.guessimg{
+	min-height:100px;
+	min-width:80px;
+	max-height:180px;
+	max-width:160px;
+}
+</style>
+
+	<style>
+		
+		.borderRed{
+			border: 1px solid red;
+		}
+		
+		.borderGreen{
+			border: 1px solid green;
+			animation: blinker 2s linear 5 ;
+			
+		}
+		
+		@keyframes blinker {  
+		  10% { opacity: 0; }
+		}
+		
+		.div2 {
+			width: 69px;
+			height: 69px;
+			padding: 10px;
+			border: 1px solid green;
+		}
+		
+		.drag_me{
+		-webkit-user-drag: element;
+	}
+
+	.hidepannel{
+		/*visibility:hidden;*/
+		display: none;
+	}
+	
+	.div1 {
+		height:180px !important;
+	}
+	.draggable .thumbnail{
+		width:135px;
+		height:160px;
+		}	
+	.draggable .thumbnail img{
+		width:132px;
+		height:150px;
+		}		
+	.media-object{
+		height:45px !important;
+	}	
+	/*
+	#oppbattle{
+		 overflow-x: scroll;
+	}
+	
+	#oppbattle::-webkit-scrollbar-track
+	{
+		-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+		background-color: #F5F5F5;
+	}
+
+	#oppbattle::-webkit-scrollbar
+	{
+		width: 2px;
+		background-color: #F5F5F5;
+	}
+
+	#oppbattle::-webkit-scrollbar-thumb
+	{
+		background-color: #000000;
+		border: 1px solid #555555;
+	}
+	
+	#mybattle{
+		 overflow-x: scroll;
+	}
+	#mybattle::-webkit-scrollbar-track
+	{
+		-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+		background-color: #F5F5F5;
+	}
+
+	#mybattle::-webkit-scrollbar
+	{
+		width: 2px;
+		background-color: #F5F5F5;
+	}
+
+	#mybattle::-webkit-scrollbar-thumb
+	{
+		background-color: #000000;
+		border: 1px solid #555555;
+	}
+	*/
+	#overlay{
+  position:fixed;
+  z-index:99999;
+  top:0;
+  left:0;
+  bottom:0;
+  right:0;
+  background:rgba(0,0,0,0.9);
+  transition: 1s 0.4s;
+}
+#progress{
+  height:1px;
+  background:#fff;
+  position:absolute;
+  width:0;                /* will be increased by JS */
+  top:50%;
+}
+#progstat{
+  font-size:0.7em;
+  letter-spacing: 3px;
+  position:absolute;
+  top:50%;
+  margin-top:-40px;
+  width:100%;
+  text-align:center;
+  color:#fff;
+}
+	</style>
+	<link type="text/css" href="http://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css" rel="stylesheet" /> 
+	<script>
+	;(function(){
+  function id(v){ return document.getElementById(v); }
+  function loadbar() {
+    var ovrl = id("overlay"),
+        prog = id("progress"),
+        stat = id("progstat"),
+        img = document.images,
+        c = 0,
+        tot = img.length;
+    if(tot == 0) return doneLoading();
+
+    function imgLoaded(){
+      c += 1;
+      var perc = ((100/tot*c) << 0) +"%";
+      prog.style.width = perc;
+      stat.innerHTML = "Loading "+ perc;
+      if(c===tot) return doneLoading();
+    }
+    function doneLoading(){
+      ovrl.style.opacity = 0;
+      setTimeout(function(){ 
+        ovrl.style.display = "none";
+      }, 1200);
+    }
+    for(var i=0; i<tot; i++) {
+      var tImg     = new Image();
+      tImg.onload  = imgLoaded;
+      tImg.onerror = imgLoaded;
+      tImg.src     = img[i].src;
+    }    
+  }
+  document.addEventListener('DOMContentLoaded', loadbar, false);
+}());
+	</script>
+	
+</head>
+<body style="overflow-x:hidden">
+	<div id="overlay">
+		<div id="progstat"></div>
+		<div id="progress"></div>
+	</div>
+
+<% if (!user) { %>
+
+<div id="wrapper" class="text-center">
+	<div class="main">
+			<div class="row">
+				<div class="col-md-12">  
+				  <div id="login">
+					<div class="logo"><img src="/Pair-Mania.png" width=280>
+						<form id="loginForm" action="/loginForm" method="get">
+							<input type="text" name="displayName" id="username" Placeholder="Username" required>
+							<input class="btn btn-primary btn-block" type="submit" value="Play">
+							<a href="/auth/facebook" class="btn btn-success btn-block fb_btn"></a>
+						</form>
+					<div class="clearfix"></div>
+					</div> <!-- end login -->
+				</div>
+			</div>	
+		</div>
+	</div>
+</div>	
+
+<% } else { %>
+<input type="hidden" id="pairmania_userid" name="pairmania_userid" value="<%= user.pairmania_id %>"/>
+<div id="gamearea">
+	<div id="main">
+		<div class="panel panel-default">
+		    <div class="panel-heading" style="padding:0px;overflow:hidden;">	
+			    <div class="pull-right" id="CountDownTimer" data-timer="300" style="width:auto;height:50px;margin-right:5px;margin-top:-5px;"></div>
+				<h3 class="panel-title">
+				    <ul class="nav nav-pills" style="height:25px;">
+					  <li role="presentation"><a type="button" href="http://www.pairmania.com" title="Leave The Room"><span class="glyphicon glyphicon-off"></span></a></li>
+					  <li role="presentation"><a type="button" href="javascript:void(0)" onclick="window.location=window.location.href" title="Refresh"><span class="glyphicon glyphicon-refresh"></span></a></li>
+					</ul>
+				</h3>
+			</div>
+			<div class="panel-body">	
+				<div  id="battleplayers" class="row">
+					<div class="col-md-6 col-lg-6 col-sm-12 col-xs-12"><div class="media"><div class="media-left"><img src="/thepair.png" class="media-object thumbnail"></div><div class="media-body"><h4 class="media-heading">Computer (<span id="compscore" class="badge blue-bg">0</span>)</h4><div id="computer"></div></div></div></div>
+					<div class="col-md-6 col-lg-6 col-sm-12 col-xs-12"><div class="media"><div class="media-left"><img id="profile" src="<%= user.photos %>" class="media-object thumbnail"></div><div class="media-body"><h4 class="media-heading"><%= user.displayName %> (<span id="myscore" class="badge green-bg">0</span>)</h4><div id="me"></div></div></div></div>
+				</div>
+				<div class="row text-center">
+					<div class="col-md-12" id="alertmsg"></div>
+				</div>
+				<div  class="row">
+					<div id="targetOutcome" class="col-md-12 col-sm-12 col-xs-12"></div>
+				</div>
+				<div  class="row">
+					<div class="col-md-12 col-sm-12 col-xs-12" id="writeFinalResult"></div>
+					<div class="text-center col-md-12 col-sm-12 col-xs-12"><div id="players"></div></div>
+					<div class="col-md-12 col-sm-12 col-xs-12" id="restartGame" style="margin:5px;"></div> 
+				</div>
+				<div class="row">
+					<div id="getAllpairs">		
+						<div id="currentuser" style="margin-top:10px;">
+						
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-12 text-center">
+						<div id="finalpair"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+ <script>
+  var mycollection =[];
+  var computercollection=[];
+  var mycount=1;
+  var compcount=1;
+	$(document).ready(function(){
+			var mybattleimgs1 =[];
+			var compbattleimgs1 =[];
+			var compbattleimg1={};
+			var mybattleimg1={};
+			
+			var compbattleimgs2 =[];
+			var compbattleimg2={};
+			var mybattleimg2={};
+	    var socket = io.connect();
+		ion.sound({
+            sounds: [
+                {name: "clock"},
+                {name: "Retro-Frantic_V001_Looping"},
+				{name: "switch"},
+				{name: "happykids"},
+				{name: "Puzzle-Dreams-3"},
+				{name: "lost"}
+            ],
+            path: "/",
+            preload: true,
+            volume: 1.0
+        });
+		 
+		socket.on('connect', function(){
+		    ion.sound.play("Retro-Frantic_V001_Looping");
+		    playername=$('.media-heading').html();
+			playerimg = $('#profile').attr('src');
+			pairmania_userid = $('#pairmania_userid').attr('value');
+			getbattleimg();
+		});
+	});
+	var clickcheck=0;
+	function getbattleimg() {
+		$('#alertmsg').html('<span class="badge green-bg" >Click on the any unknown Card</span>');
+		$('#currentuser').html('');
+		$("#menuToggler").hide(500);
+		
+		var imgvalue=['1','2','18','19','20','3','4','5','9','10','11','1','2','12','6','7','8','9','10','20','3','4','5','9','10','11','12','13','14','15','16','17','18','19','12','13','14','15','20','21'];
+	    
+		for(var i=0;i<30;i++){
+			var j = Math.floor(Math.random() * 20) + 0; 
+			var imgscore = Math.floor(Math.random() * 500) + 50; 
+			$('#currentuser').append('<div data-val="'+imgvalue[j]+'" data-score="'+imgscore+'" class="col-xs-3 col-sm-2 col-md-2 col-lg-2 guessimg guesscomp"><a href="javascript:void(0)" class="thumbnail text-center blurimage"><img  src="/'+imgvalue[j]+'.jpg" img-val="'+imgvalue[j]+'"><span class="badge">'+imgscore+'</span></a></div>');
+			i++;
+		}
+	}	
+	
+	$(document).on('click','.guessimg',function(e){
+	   compcount=1;
+	   var th = $(this);
+	   var mybattleimg1={};
+	   var myscore=0;
+	   var imgscore=$(this).attr('data-score');
+	   var imgvalue=$(this).attr('data-val');
+		
+	   if(clickcheck==0){
+		ion.sound.play("switch");
+		$(this).find('.blurimage').removeClass('blurimage');
+		$('#me').append('<div class="col-xs-3 col-sm-2 col-md-2 receiveimg"><a href="javascript:void(0)" class="thumbnail text-center"><img  src="/'+imgvalue+'.jpg"  img-val="'+imgvalue+'"><span class="badge" style="background-color:#4CAF50;margin:1px;">'+imgscore+'</span></a></div>');
+		$(this).hide(3000);
+		clickcheck++;
+		setTimeout(
+		  function() 
+		  {
+			th.remove();
+			
+			var mind = mycollection.length;
+			
+			if(mind){
+				console.log(mycollection[mind-1].imgvalue);
+				if(mycollection[mind-1].imgvalue==imgvalue){
+				    mycount++;
+					imgscore=imgscore*mycount;
+					$('#alertmsg').html('<span class="badge green-bg" >Hurray!!! You have got one more chance</span>');
+					mybattleimg1={
+						imgvalue:imgvalue,
+						imgscore:imgscore
+					};
+		
+					mycollection.push(mybattleimg1);
+					checkMatch();
+					clickcheck=0;
+					var y =$("#me").find(".thumbnail");
+					console.log('Y'+y.length);
+					var th1=0;
+					for(var k=1;k<=mycount;k++){
+						th1=$("#me").find(".thumbnail").eq(y.length-k);
+						th1.css("background-color", "#dff0d8");
+					}
+				}else{
+					mybattleimg1={
+						imgvalue:imgvalue,
+						imgscore:imgscore
+					};
+		
+					$('#alertmsg').html("<span class='badge blue-bg' >Computer's Turn </span>");
+					mycollection.push(mybattleimg1);
+					checkMatch();
+					compturn();
+				}
+				
+			}else{
+				mybattleimg1={
+						imgvalue:imgvalue,
+						imgscore:imgscore
+					};
+		
+				$('#alertmsg').html("<span class='badge blue-bg' >Computer's Turn </span>");
+				compturn();
+				mycollection.push(mybattleimg1);
+			}
+			
+				for(var i=0;i<mycollection.length;i++){
+					myscore=parseInt(myscore)+parseInt(mycollection[i].imgscore);
+				}
+				$('#myscore').html(myscore);
+				$('#myscore').animateNumber({ number: myscore });
+				setTimeout(
+				  function() 
+				  { 
+				var x = document.getElementsByClassName("guessimg");
+				if(!x.length){
+					gameover();
+				}
+			},2000);	
+				
+		  }, 3000);
+		
+		clickcheck++;
+		}else{
+			ion.sound.play("lost");
+		}
+	});
+	
+	function compturn(){
+		mycount=1;
+		ion.sound.play("switch");
+		var compscore=0;
+		var computerbattleimg={};
+		var x = document.getElementsByClassName("guessimg");
+		if(x.length){
+		var index = Math.floor(Math.random() * x.length) + 0; 
+		var th=$( ".guesscomp").eq(index);
+		console.log(x.length+'+++++'+th+'---'+index);
+		var imgscore=th.attr('data-score');
+		var imgvalue=th.attr('data-val');
+		th.find('.blurimage').removeClass('blurimage');
+		$('#computer').append('<div class="col-xs-3 col-sm-2 col-md-2 receiveimg"><a href="javascript:void(0)" class="thumbnail text-center"><img  src="/'+imgvalue+'.jpg"  img-val="'+imgvalue+'"><span class="badge blue-bg">'+imgscore+'</span></a></div>');
+		th.hide(3000);
+		
+		setTimeout(
+		  function() 
+		  { th.remove();
+			$('#alertmsg').html("<span class='badge green-bg'>Your's Turn</span>");
+			
+			var cind=computercollection.length;
+			if(cind){
+				console.log(computercollection[cind-1].imgvalue);
+				if(computercollection[cind-1].imgvalue==imgvalue){
+					compcount++;
+					
+					var y =$("#computer").find(".thumbnail");
+					console.log('Y'+y.length);
+					var th1=0;
+					for(var k=1;k<=compcount;k++){
+						th1=$("#computer").find(".thumbnail").eq(y.length-k);
+						th1.css("background-color", "#d9edf7");
+					}
+					
+					imgscore=imgscore*compcount;
+					$('#alertmsg').html("<span class='badge blue-bg' >Computer will get one more chance</span>");
+					computerbattleimg={
+						imgvalue:imgvalue,
+						imgscore:imgscore
+					};
+					computercollection.push(computerbattleimg);
+					checkMatch();
+					compturn();
+				}else{
+					computerbattleimg={
+						imgvalue:imgvalue,
+						imgscore:imgscore
+					};
+					computercollection.push(computerbattleimg);
+					checkMatch();
+				}
+			}else{
+				computerbattleimg={
+						imgvalue:imgvalue,
+						imgscore:imgscore
+					};
+				computercollection.push(computerbattleimg);
+				checkMatch();
+			}
+			
+			clickcheck=0;
+			for(var i=0;i<computercollection.length;i++){
+			console.log(computercollection[i]);
+				compscore=parseInt(compscore)+parseInt(computercollection[i].imgscore);
+			}
+			
+			$('#compscore').html(compscore);
+			$('#compscore').animateNumber({ number: compscore });
+		
+		 }, 3000);
+		 setTimeout(
+		  function() 
+		  { 
+			var x = document.getElementsByClassName("guessimg");
+				if(!x.length){
+					gameover();
+				}
+		   },4000);
+		}else{
+		     setTimeout(
+		  function() 
+		  { 
+			gameover();
+		},2000);	
+		}
+	}
+	var isloopcheck=0;
+	function gameover(){
+	    
+		var compscore = $('#compscore').html();
+		var myscore = $('#myscore').html();
+		console.log(compscore+'-------'+myscore);
+		if(parseInt(compscore)>parseInt(myscore)){
+			$('#alertmsg').html("<span class='badge blue-bg' >Computer Win !!!</span>");
+			ion.sound.play("lost");
+		}else{
+		$('#alertmsg').html("<span class='badge green-bg' >You Win !!!</span>");
+		ion.sound.play("happykids");
+		
+		if(mycollection.push.apply(mycollection, computercollection) && isloopcheck==0){
+			console.log('after--'+mycollection.length);
+			
+			var sorted_arr = mycollection.sort(sort_by('imgvalue', true, parseInt));
+			console.log('sorted_arr'+sorted_arr);			
+			var results = [];
+			for (var i = 0; i < mycollection.length - 1; i++) {
+				if (sorted_arr[i + 1].imgvalue == sorted_arr[i].imgvalue) {
+					results.push(sorted_arr[i].imgvalue);
+				}
+				
+			}
+			displayresult(results);
+			isloopcheck++;
+		}
+		
+		}
+	}
+	var sort_by = function(field, reverse, primer){
+
+	   var key = primer ? 
+		   function(x) {return primer(x[field])} : 
+		   function(x) {return x[field]};
+
+	   reverse = !reverse ? 1 : -1;
+
+	   return function (a, b) {
+		   return a = key(a), b = key(b), reverse * ((a > b) - (b > a));
+		 } 
+	}
+	
+	function displayresult(arr){
+		if(arr.length){
+			var finalresult=[];
+			var finalcol={};
+			for(var i=0;i<=arr.length-1;i++){
+				var score=0;
+				var checkcount=0;
+				for(var j=0;j<=mycollection.length-1;j++){
+					if(arr[i]==mycollection[j].imgvalue){
+						score = score+parseInt(mycollection[j].imgscore); 
+					checkcount++;
+					}
+				}
+				score=parseInt(score/checkcount);
+				finalcol={
+					imgvalue:arr[i],
+					imgscore:score
+				};
+				finalresult.push(finalcol);
+			}
+			console.log(finalresult);
+			$('#finalpair').append('<div class="alert alert-success"><h4>Congratulation!!! You have made the following pairs: </h4></div>');
+			for(var i=0;i<finalresult.length;i++){
+				$('#finalpair').append('<div class="col-xs-3 col-sm-2 col-md-2 col-lg-2"><a href="javascript:void(0)" class="thumbnail text-center"><img  src="/'+finalresult[i].imgvalue+'.jpg" ><span class="badge green-bg">'+finalresult[i].imgscore+'</span></a></div>');
+			}
+		}else{
+			$('#finalpair').append('<div class="alert alert-danger">Sorry!!! unfortunately you are unable to make pairs</div>');
+		}		
+	}
+	
+	    function checkMatch(){	
+		    var cind=computercollection.length;
+			var mind=mycollection.length;
+			
+			if(cind && mind){
+				
+				if(parseInt(mycollection[mind-1].imgvalue)==parseInt(computercollection[cind-1].imgvalue)){
+					var th2=0;
+					if(parseInt(mycollection[mind-1].imgscore)<parseInt(computercollection[cind-1].imgscore)){
+						var y =$("#computer").find(".thumbnail");
+						th2=$("#computer").find(".thumbnail").eq(y.length-1);
+						th2.css("background-color", "#dff0d8");
+						var z =$("#me").find(".thumbnail");
+						th3=$("#me").find(".thumbnail").eq(z.length-1);
+						th3.css("background-color", "#dff0d8");
+						$("#computer").append('<div class="col-xs-3 col-sm-2 col-md-2 receiveimg"><a href="javascript:void(0)" class="thumbnail text-center">'+th3.html()+'</a></div>');
+						th3.remove();
+						computercollection.push.apply(computercollection,mycollection);
+						
+						var myscore = (parseInt($('#myscore').text())-parseInt(mycollection[mind-1].imgscore));
+						$('#myscore').animateNumber({ number: myscore });
+						var compscore = (parseInt($('#compscore').text())+parseInt(computercollection[cind-1].imgscore));
+						$('#compscore').animateNumber({ number: compscore });
+					
+						mycollection = mycollection.filter(function(item){ 
+							return (item.imgvalue !== mycollection[mind-1].imgvalue); 
+						});
+						
+					}else if(parseInt(mycollection[mind-1].imgscore)>parseInt(computercollection[cind-1].imgscore)){
+						var y =$("#me").find(".thumbnail");
+						th2=$("#me").find(".thumbnail").eq(y.length-1);
+						th2.css("background-color", "#dff0d8");
+						var z =$("#computer").find(".thumbnail");
+						th3=$("#computer").find(".thumbnail").eq(z.length-1);
+						th3.css("background-color", "#dff0d8");
+						$("#me").append('<div class="col-xs-3 col-sm-2 col-md-2 receiveimg"><a href="javascript:void(0)" class="thumbnail text-center">'+th3.html()+'</a></div>');
+						th3.remove();
+						mycollection.push.apply(mycollection,computercollection);
+							var myscore = (parseInt($('#myscore').text())+parseInt(mycollection[mind-1].imgscore));
+						$('#myscore').animateNumber({ number: myscore });
+						var compscore = (parseInt($('#compscore').text())-parseInt(computercollection[cind-1].imgscore));
+						$('#compscore').animateNumber({ number: compscore });
+					
+						computercollection = computercollection.filter(function(item){ 
+							return (item.imgvalue !== computercollection[cind-1].imgvalue); 
+						});
+					}
+				}
+			}
+		}	
+	/*
+	*/
+</script>
+<% } %>
+</body>
+</html>
